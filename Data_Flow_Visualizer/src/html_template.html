@@ -28,9 +28,11 @@
   </div>
   <div id="info"><p>Нажмите на узел или стрелку</p></div>
 </div>
+<script id="NODE_DATA" type="application/json">__NODE_DATA__</script>
 <script id="VIS_NODES" type="application/json">__VIS_NODES__</script>
 <script id="VIS_EDGES" type="application/json">__VIS_EDGES__</script>
 <script>
+const nodeData = JSON.parse(document.getElementById("NODE_DATA").textContent);
 const nodesRaw = JSON.parse(document.getElementById("VIS_NODES").textContent);
 const edgesRaw = JSON.parse(document.getElementById("VIS_EDGES").textContent);
 const nodes = new vis.DataSet(nodesRaw);
@@ -43,10 +45,33 @@ const network = new vis.Network(container,{nodes,edges},{
 });
 const info=document.getElementById("info");
 network.on("click",p=>{
- if(p.nodes.length>0){
-  const id=p.nodes[0];
-  info.innerHTML=`<h3>${id}</h3>`;
- } else if(p.edges.length>0){
+ if (p.nodes.length > 0) {
+  const id = p.nodes[0];
+  const n = nodeData[id];
+  if (!n) { info.innerHTML = `<h3>${id}</h3>`; return; }
+
+  let html = `<h3>${id}</h3>
+              <p><b>Тип:</b> ${n.type}</p>
+              <p><b>Слой:</b> ${n.layer}</p>
+              <p>${n.comment}</p>`;
+
+  if (n.columns && n.columns.length) {
+    html += `<table>
+      <tr><th>Колонка</th><th>Тип данных</th><th>Описание</th><th>Комментарий</th></tr>`;
+    n.columns.forEach(c => {
+      html += `<tr>
+        <td>${c.name || "-"}</td>
+        <td>${c.type || "-"}</td>
+        <td>${c.description || "-"}</td>
+        <td>${c.comment || "-"}</td>
+      </tr>`;
+    });
+    html += `</table>`;
+  }
+
+  info.innerHTML = html;
+}
+ else if(p.edges.length>0){
   const e=edges.get(p.edges[0]);
   let html=`<h3>${e.from} → ${e.to}</h3><p><b>Тип передачи:</b> ${e.transfer_type}</p><p><b>Тип данных:</b> ${e.data_type}</p>`;
   if(e.transfer&&e.transfer.length){html+=`<table><tr><th>Поле</th><th>Описание</th></tr>`;e.transfer.forEach(t=>html+=`<tr><td>${t[0]}</td><td>${t[1]}</td></tr>`);html+=`</table>`;}

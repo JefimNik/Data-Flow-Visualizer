@@ -34,9 +34,20 @@ def main():
             "arrows": {"to": {"enabled": True, "type": "arrow", "scaleFactor": 0.8}},
             "length": 250
         })
+    # --- ДОБАВЛЯЕМ node_data ---
+    node_data = {}
+    for n in nodes:
+        node_data[n["name"]] = {
+            "layer": n.get("layer", ""),
+            "type": n.get("type", ""),
+            "comment": n.get("comment", ""),
+            "columns": n.get("columns", [])
+        }
 
-    html = tpl.replace("__VIS_NODES__", json.dumps(vis_nodes, ensure_ascii=False))
+    html = tpl.replace("__NODE_DATA__", json.dumps(node_data, ensure_ascii=False))
+    html = html.replace("__VIS_NODES__", json.dumps(vis_nodes, ensure_ascii=False))
     html = html.replace("__VIS_EDGES__", json.dumps(vis_edges, ensure_ascii=False))
+
     pathlib.Path(OUTPUT).write_text(html, encoding="utf-8")
     print(f"✅ Сгенерировано: {pathlib.Path(OUTPUT).resolve()}")
 
