@@ -7,15 +7,15 @@ nodes:
   type: Excel
   comment: Основной справочник материалов и узлов для проекта.
   columns:
-  - name: LOT
+  - name: LOT5
     type: TEXT
     description: Код сборочной партии (LOT)
     comment: Основное поле для объединения данных
-  - name: MFZ
+  - name: MFZ2
     type: TEXT
     description: Код монтажной зоны
     comment: Используется для группировки деталей
-  - name: Material
+  - name: '4'
     type: Number10
     description: Тип материала
     comment: Поле из ERP каталога
@@ -45,7 +45,7 @@ nodes:
   type: Excel
   comment: Учёт рабочих часов по LOT и зонам.
   columns:
-  - name: LOT
+  - name: LOT4
     type: TEXT
     description: Идентификатор партии
     comment: Ключ для объединения

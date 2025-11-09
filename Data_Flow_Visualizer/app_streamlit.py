@@ -75,7 +75,6 @@ with col2:
         grid_response = AgGrid(
             columns_df,
             gridOptions=grid_options,
-            update_mode=GridUpdateMode.MODEL_CHANGED,
             height=400,
             fit_columns_on_grid_load=True,
             allow_unsafe_jscode=True,
