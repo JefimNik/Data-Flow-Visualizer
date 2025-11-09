@@ -2,27 +2,43 @@ version: 1.2
 author: Jefim
 description: Пример модели данных для Data Flow Visualizer
 nodes:
-- name: Catalog_input
-  layer: SharePoint
-  type: Excel
+- name: Catalog_input2
+  layer: '11111'
+  type: ваввв
   comment: Основной справочник материалов и узлов для проекта.
   columns:
-  - name: LOT6
-    type: TEXT
-    description: Код сборочной партии (LOT)
-    comment: Основное поле для объединения данных
-  - name: MFZ2
+  - name: ngcjghc
     type: TEXT
     description: Код монтажной зоны
     comment: Используется для группировки деталей
-  - name: '4'
+  - name: '3'
     type: Number10
     description: Тип материала
     comment: Поле из ERP каталога
-  - name: Supplier
+  - name: ggg
     type: TEXT
     description: Поставщик
     comment: Указывается при импорте каталога
+  - name: '5'
+    type: ''
+    description: ''
+    comment: ''
+  - name: чапрпачр
+    type: чапр
+    description: ачрр
+    comment: ''
+  - name: чапрчар
+    type: ''
+    description: апр
+    comment: ''
+  - name: ''
+    type: ''
+    description: пррп
+    comment: ''
+  - name: ''
+    type: ''
+    description: прп
+    comment: ''
 - name: Saved_progress
   layer: SharePoint
   type: Excel
@@ -63,7 +79,7 @@ nodes:
     comment: Дата фиксации рабочих часов
 - name: Merged_Spool_Data
   layer: PowerQuery
-  type: Table
+  type: Table2
   comment: Объединённая таблица с материалами, статусами и часами.
   columns:
   - name: LOT
@@ -86,6 +102,22 @@ nodes:
     type: FLOAT
     description: Вес сборки
     comment: Вычисляется автоматически в PQ
+  - name: 1
+    type: ''
+    description: ''
+    comment: ''
+  - name: 2
+    type: ''
+    description: ''
+    comment: ''
+  - name: 3
+    type: ''
+    description: ''
+    comment: ''
+  - name: 4
+    type: ''
+    description: ''
+    comment: ''
 - name: Transfer_Orders
   layer: Output
   type: Report
