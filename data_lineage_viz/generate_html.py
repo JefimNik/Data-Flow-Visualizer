@@ -11,7 +11,7 @@ def main():
     nodes_in = model.get("nodes", [])
     edges_in = model.get("edges", [])
 
-    # 1) Правый сайдбар: словарь -> id узла => метаданные и колонки
+    # --- узлы
     node_data = {}
     for n in nodes_in:
         cols = []
@@ -30,21 +30,36 @@ def main():
             "columns": cols
         }
 
-    # 2) Узлы для vis-network. Лейбл с переносом строки: реальный \n
     vis_nodes = []
     for n in nodes_in:
-        label = f"{n['name']}\n({n.get('layer','')})"  # важен реальный \n
+        label = f"{n['name']}\n({n.get('layer','')})"
         vis_nodes.append({
             "id": n["name"],
             "label": label,
-            "group": n.get("layer","") or "Default"
+            "group": n.get("layer",""),
         })
 
-    # 3) Рёбра
-    vis_edges = [{"from": e["from"], "to": e["to"], "arrows":"to"} for e in edges_in]
+    # --- стили стрелок
+    edge_styles = {
+        "normal":   {"color": "rgba(180,180,180,1)",   "dashes": False},
+        "manual":   {"color": "rgba(255,223,107,1)",   "dashes": True},
+        "planned":  {"color": "rgba(150,150,150,0.25)","dashes": False},  # теперь реально прозрачная
+    }
 
-    # Безопасно вставляем JSON внутрь <script type="application/json">
-    html = (tpl
+    vis_edges = []
+    for e in edges_in:
+        style = edge_styles.get(e.get("type", "normal"), edge_styles["normal"])
+        vis_edges.append({
+            "from": e["from"],
+            "to": e["to"],
+            "arrows": "to",
+            "color": style["color"],
+            "dashes": style["dashes"],
+            "type": e.get("type", "normal"),
+        })
+
+    html = (
+        tpl
         .replace("__NODE_DATA__", json.dumps(node_data, ensure_ascii=False))
         .replace("__VIS_NODES__", json.dumps(vis_nodes, ensure_ascii=False))
         .replace("__VIS_EDGES__", json.dumps(vis_edges, ensure_ascii=False))

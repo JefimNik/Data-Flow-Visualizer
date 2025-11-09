@@ -7,7 +7,6 @@ nodes:
         columns:
           - { name: LOT, link: "Merged_Spool_Data.LOT", comment: "ключ LOT" }
           - { name: MFZ, link: "Merged_Spool_Data.MFZ", comment: "зона сборки" }
-          - { name: DN,  link: "", comment: "диаметр" }
     comment: "Основной справочник материалов."
 
   - name: Saved_progress
@@ -43,6 +42,12 @@ nodes:
     comment: "Финальный отчёт."
 
 edges:
-  - { from: Catalog_input, to: Merged_Spool_Data }
-  - { from: Saved_progress, to: Merged_Spool_Data }
-  - { from: Merged_Spool_Data, to: Transfer_Orders }
+  # обычная связь (автоматическая)
+  - { from: Catalog_input, to: Merged_Spool_Data, type: normal }
+  - { from: Saved_progress, to: Merged_Spool_Data, type: normal }
+
+  # пунктирная (ручной перенос)
+  - { from: Merged_Spool_Data, to: Transfer_Orders, type: manual }
+
+  # полупрозрачная (связь планируется)
+  - { from: Saved_progress, to: Transfer_Orders, type: planned }
