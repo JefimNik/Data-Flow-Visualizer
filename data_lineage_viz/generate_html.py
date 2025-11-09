@@ -11,51 +11,43 @@ def main():
     nodes_in = model.get("nodes", [])
     edges_in = model.get("edges", [])
 
-    # --- узлы ---
-    node_data = {}
-    for n in nodes_in:
-        cols = []
-        for sh in n.get("sheets", []) or []:
-            for c in sh.get("columns", []) or []:
-                cols.append({
-                    "Sheet": sh.get("name", ""),
-                    "Column": c.get("name", ""),
-                    "Link": c.get("link", ""),
-                    "Comment": c.get("comment", ""),
-                })
-        node_data[n["name"]] = {
-            "layer": n.get("layer", ""),
-            "type": n.get("type", ""),
-            "comment": n.get("comment", ""),
-            "columns": cols,
-        }
+    node_data = {n["name"]: {"layer": n.get("layer",""), "type": n.get("type",""), "comment": n.get("comment","")} for n in nodes_in}
+    vis_nodes = [{"id": n["name"], "label": f"{n['name']}\n({n.get('layer','')})", "group": n.get("layer","")} for n in nodes_in]
 
-    vis_nodes = [
-        {"id": n["name"], "label": f"{n['name']}\n({n.get('layer','')})", "group": n.get("layer", "")}
-        for n in nodes_in
-    ]
-
-    # --- стили стрелок по типу передачи ---
+    # Тип линии (форма)
     style_map = {
-        "pq":       {"color": "rgba(180,180,180,1)",   "dashes": False},
-        "manual":   {"color": "rgba(255,223,107,1)",   "dashes": True},
-        "planned":  {"color": "rgba(150,150,150,0.25)","dashes": False},
-        "default":  {"color": "rgba(200,200,200,1)",   "dashes": False},
+        "pq":       {"dashes": False, "opacity": 1.0},
+        "manual":   {"dashes": True,  "opacity": 1.0},
+        "planned":  {"dashes": False, "opacity": 0.3},
+        "default":  {"dashes": False, "opacity": 1.0},
+    }
+
+    # Цвет по типу данных
+    color_map = {
+        "workers":    "#66c2a5",
+        "progress":   "#fc8d62",
+        "hours":      "#8da0cb",
+        "cost":       "#e78ac3",
+        "materials":  "#a6d854",
+        "documents":  "#ffd92f",
+        "general":    "#cfcfcf",
     }
 
     vis_edges = []
     for i, e in enumerate(edges_in):
-        transfer_type = e.get("transfer_type", "default")
-        style = style_map.get(transfer_type, style_map["default"])
+        t_type = e.get("transfer_type", "default")
+        d_type = e.get("data_type", "general")
+        s = style_map.get(t_type, style_map["default"])
+        color = color_map.get(d_type, color_map["general"])
         vis_edges.append({
             "id": f"edge_{i}_{e['from']}_{e['to']}",
             "from": e["from"],
             "to": e["to"],
             "transfer": e.get("transfer", []),
-            "transfer_type": transfer_type,
-            "data_type": e.get("data_type", "general"),
-            "color": style["color"],
-            "dashes": style["dashes"],
+            "transfer_type": t_type,
+            "data_type": d_type,
+            "color": f"rgba({int(color[1:3],16)}, {int(color[3:5],16)}, {int(color[5:7],16)}, {s['opacity']})",
+            "dashes": s["dashes"],
             "arrows": {"to": {"enabled": True, "type": "arrow", "scaleFactor": 0.8}},
             "length": 250
         })
@@ -63,7 +55,6 @@ def main():
     html = tpl.replace("__NODE_DATA__", json.dumps(node_data, ensure_ascii=False))
     html = html.replace("__VIS_NODES__", json.dumps(vis_nodes, ensure_ascii=False))
     html = html.replace("__VIS_EDGES__", json.dumps(vis_edges, ensure_ascii=False))
-
     pathlib.Path(OUTPUT).write_text(html, encoding="utf-8")
     print(f"✅ Сгенерировано: {pathlib.Path(OUTPUT).resolve()}")
 

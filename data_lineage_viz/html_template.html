@@ -5,39 +5,13 @@
 <title>Data Flow Visualizer</title>
 <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 <style>
-  body {
-    margin: 0;
-    display: flex;
-    height: 100vh;
-    background: #111;
-    color: #eee;
-    font-family: "Segoe UI", sans-serif;
-  }
-  #mynetwork {
-    flex: 2;
-    background: #1b1b1b;
-  }
-  #details {
-    flex: 1;
-    background: #141414;
-    padding: 12px;
-    overflow-y: auto;
-    border-left: 2px solid #222;
-  }
-  #filter {
-    padding: 10px;
-    border-bottom: 1px solid #333;
-    background: #1d1d1d;
-  }
-  table {
-    border-collapse: collapse;
-    width: 100%;
-    font-size: 13px;
-    margin-top: 8px;
-  }
-  th,td { border: 1px solid #333; padding: 4px 6px; }
-  th { background: #222; color: #ffdf6b; }
-  tr:hover td { background: #2b2b2b; }
+  body { margin:0; display:flex; height:100vh; background:#111; color:#eee; font-family:"Segoe UI",sans-serif; }
+  #mynetwork { flex:2; background:#1b1b1b; }
+  #details { flex:1; background:#141414; padding:12px; overflow-y:auto; border-left:2px solid #222; }
+  #filter { padding:10px; border-bottom:1px solid #333; background:#1d1d1d; }
+  table { border-collapse:collapse; width:100%; font-size:13px; margin-top:8px; }
+  th,td { border:1px solid #333; padding:4px 6px; }
+  th { background:#222; color:#ffdf6b; }
 </style>
 </head>
 <body>
@@ -45,9 +19,12 @@
   <div id="details">
     <div id="filter">
       <b>Фильтр по типу данных:</b><br>
+      <label><input type="checkbox" class="dtype" value="workers" checked> workers</label><br>
       <label><input type="checkbox" class="dtype" value="progress" checked> progress</label><br>
+      <label><input type="checkbox" class="dtype" value="hours" checked> hours</label><br>
       <label><input type="checkbox" class="dtype" value="cost" checked> cost</label><br>
-      <label><input type="checkbox" class="dtype" value="general" checked> general</label><br>
+      <label><input type="checkbox" class="dtype" value="materials" checked> materials</label><br>
+      <label><input type="checkbox" class="dtype" value="documents" checked> documents</label><br>
     </div>
     <div id="info"><p>Нажмите на узел или стрелку</p></div>
   </div>
@@ -60,32 +37,30 @@
   const nodeData = JSON.parse(document.getElementById("NODE_DATA").textContent);
   const nodesRaw = JSON.parse(document.getElementById("VIS_NODES").textContent);
   const edgesRaw = JSON.parse(document.getElementById("VIS_EDGES").textContent);
-
   const nodes = new vis.DataSet(nodesRaw);
   const edges = new vis.DataSet(edgesRaw);
 
   const container = document.getElementById("mynetwork");
   const network = new vis.Network(container, { nodes, edges }, {
     physics: { enabled: true, barnesHut: { gravitationalConstant: -3000 } },
-    nodes: { shape: "box", font: { color: "#888", size: 14, bold: false } },
-    edges: { smooth: { type: "cubicBezier" }, width: 1.3 }
+    nodes: {
+      shape: "box",
+      font: { color: "#0e0e0e", size: 14 }, /* ← темнее чем фон */
+      borderWidth: 1,
+      margin: 10,
+      color: { background: "#1b1b1b", border: "#333" }
+    },
+    edges: { smooth: { type: "cubicBezier" }, width: 1.4 }
   });
 
   const info = document.getElementById("info");
 
-  // --- клики ---
   network.on("click", (params) => {
     if (params.nodes.length > 0) {
       const id = params.nodes[0];
       const n = nodeData[id];
       if (!n) return;
-      let html = `<h3>${id}</h3><p><b>Тип:</b> ${n.type} | <b>Слой:</b> ${n.layer}</p><p>${n.comment}</p>`;
-      if (n.columns && n.columns.length) {
-        html += `<table><tr><th>Sheet</th><th>Column</th><th>Link</th><th>Comment</th></tr>`;
-        n.columns.forEach(c => html += `<tr><td>${c.Sheet}</td><td>${c.Column}</td><td>${c.Link}</td><td>${c.Comment}</td></tr>`);
-        html += `</table>`;
-      }
-      info.innerHTML = html;
+      info.innerHTML = `<h3>${id}</h3><p><b>Тип:</b> ${n.type}</p><p><b>Слой:</b> ${n.layer}</p><p>${n.comment}</p>`;
     } else if (params.edges.length > 0) {
       const e = edges.get(params.edges[0]);
       let html = `<h3>${e.from} → ${e.to}</h3>
@@ -100,14 +75,11 @@
     }
   });
 
-  // --- фильтр ---
+  // фильтр
   document.querySelectorAll('.dtype').forEach(chk => {
     chk.addEventListener('change', () => {
       const active = Array.from(document.querySelectorAll('.dtype:checked')).map(c => c.value);
-      edgesRaw.forEach(e => {
-        const visible = active.includes(e.data_type);
-        edges.update({ id: e.id, hidden: !visible });
-      });
+      edgesRaw.forEach(e => edges.update({ id: e.id, hidden: !active.includes(e.data_type) }));
     });
   });
 </script>
