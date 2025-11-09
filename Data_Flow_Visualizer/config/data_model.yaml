@@ -2,7 +2,7 @@ version: 1.2
 author: Jefim
 description: Пример модели данных для Data Flow Visualizer
 nodes:
-- name: Catalog_input2
+- name: Catalog_input
   layer: '11111'
   type: ваввв
   comment: Основной справочник материалов и узлов для проекта.
@@ -11,34 +11,42 @@ nodes:
     type: TEXT
     description: Код монтажной зоны
     comment: Используется для группировки деталей
+    new: ''
   - name: '3'
     type: Number10
     description: Тип материала
     comment: Поле из ERP каталога
+    new: '1'
   - name: ggg
     type: TEXT
     description: Поставщик
     comment: Указывается при импорте каталога
+    new: '1'
   - name: '5'
     type: ''
     description: ''
     comment: ''
+    new: '2'
   - name: чапрпачр
     type: чапр
     description: ачрр
     comment: ''
+    new: dgdf
   - name: чапрчар
     type: ''
     description: апр
     comment: ''
+    new: ''
   - name: ''
     type: ''
     description: пррп
     comment: ''
+    new: ''
   - name: ''
     type: ''
     description: прп
     comment: ''
+    new: ''
 - name: Saved_progress
   layer: SharePoint
   type: Excel

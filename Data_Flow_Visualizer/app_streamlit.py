@@ -126,15 +126,32 @@ if node:
             type_ = ws["B4"].value or ""
             comment = ws["B5"].value or ""
 
-            # Читаем таблицу колонок
+            # --- Читаем таблицу колонок с гибким числом столбцов ---
             start_row = 9
-            headers = [ws.cell(row=8, column=i).value for i in range(1, 5)]
+
+            # Определяем, сколько реально есть заголовков (до первой пустой ячейки в строке 8)
+            headers = []
+            col = 1
+            while True:
+                val = ws.cell(row=8, column=col).value
+                if val is None or str(val).strip() == "":
+                    break
+                headers.append(str(val).strip())
+                col += 1
+
+            # Если вообще нет заголовков — используем стандартные
+            if not headers:
+                headers = ["name", "type", "description", "comment"]
+
+            # Читаем строки данных
             data_rows = []
             for r in range(start_row, ws.max_row + 1):
-                row_data = {headers[i - 1]: ws.cell(row=r, column=i).value for i in range(1, len(headers) + 1)}
+                row_data = {h: ws.cell(row=r, column=i + 1).value for i, h in enumerate(headers)}
                 if any(v is not None for v in row_data.values()):
                     data_rows.append(row_data)
-            cols_df = sanitize_dataframe(pd.DataFrame(data_rows))
+
+            # Приводим к чистому виду (без NaN и смешанных типов)
+            cols_df = sanitize_dataframe(pd.DataFrame(data_rows, columns=headers))
 
             # Обновляем YAML
             new_name = str(name).strip() or selected_node_name
