@@ -7,46 +7,118 @@ nodes:
   type: ваввв
   comment: Основной справочник материалов и узлов для проекта.
   columns:
-  - name: ngcjghc
-    type: TEXT
-    description: Код монтажной зоны
-    comment: Используется для группировки деталей
-    new: ''
-  - name: '3'
-    type: Number10
-    description: Тип материала
-    comment: Поле из ERP каталога
-    new: '1'
-  - name: ggg
-    type: TEXT
-    description: Поставщик
-    comment: Указывается при импорте каталога
-    new: '1'
-  - name: '5'
-    type: ''
+  - comment: ngcjghc
+    description: TEXT
+    name2: Код монтажной зоны
+    type: '1'
+    пва: ''
+    test1: ''
+    test2: ''
+    test3: ''
+    test4: ''
+    test5: ''
+    test6: ''
+    test7: ''
+    test8: ''
+    test9: ''
+  - comment: '3'
+    description: Number10
+    name2: Тип материала
+    type: '1'
+    пва: ''
+    test1: ''
+    test2: ''
+    test3: g
+    test4: ''
+    test5: ''
+    test6: ''
+    test7: ''
+    test8: ''
+    test9: ''
+  - comment: ggg
+    description: TEXT
+    name2: Поставщик
+    type: '2'
+    пва: ''
+    test1: ''
+    test2: ''
+    test3: ''
+    test4: ''
+    test5: ''
+    test6: ''
+    test7: ''
+    test8: ''
+    test9: ''
+  - comment: '5'
     description: ''
-    comment: ''
-    new: '2'
-  - name: чапрпачр
-    type: чапр
-    description: ачрр
-    comment: ''
-    new: dgdf
-  - name: чапрчар
+    name2: ''
+    type: '2'
+    пва: ''
+    test1: ''
+    test2: ''
+    test3: ''
+    test4: ''
+    test5: ''
+    test6: ''
+    test7: ''
+    test8: ''
+    test9: ''
+  - comment: чапрпачр
+    description: чапр
+    name2: ачрр
+    type: dgdf
+    пва: ''
+    test1: ''
+    test2: ''
+    test3: ''
+    test4: ''
+    test5: ''
+    test6: ''
+    test7: ''
+    test8: ''
+    test9: ''
+  - comment: чапрчар
+    description: ''
+    name2: апр
     type: ''
-    description: апр
-    comment: ''
-    new: ''
-  - name: ''
+    пва: ''
+    test1: ''
+    test2: ''
+    test3: ''
+    test4: ''
+    test5: ''
+    test6: ''
+    test7: ''
+    test8: ''
+    test9: ''
+  - comment: ''
+    description: ''
+    name2: пррп
     type: ''
-    description: пррп
-    comment: ''
-    new: ''
-  - name: ''
+    пва: ''
+    test1: ''
+    test2: ''
+    test3: ''
+    test4: ''
+    test5: ''
+    test6: g
+    test7: ''
+    test8: ''
+    test9: g
+  - comment: ''
+    description: ''
+    name2: прп
     type: ''
-    description: прп
-    comment: ''
-    new: ''
+    пва: ''
+    test1: ''
+    test2: ''
+    test3: ''
+    test4: ''
+    test5: ''
+    test6: ''
+    test7: ''
+    test8: ''
+    test9: ''
 - name: Saved_progress
   layer: SharePoint
   type: Excel

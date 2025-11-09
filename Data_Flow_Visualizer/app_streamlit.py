@@ -13,16 +13,19 @@ CONFIG_PATH = BASE / "config" / "data_model.yaml"
 GENERATOR = BASE / "src" / "generate_html.py"
 BUILD_HTML = BASE / "build" / "data_model_v1.html"
 
+
 # --------- Работа с YAML ---------
 def load_yaml(path):
     with open(path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
+
 
 def save_yaml(path, data):
     with open(path, "w", encoding="utf-8") as f:
         yaml.safe_dump(data, f, allow_unicode=True, sort_keys=False)
         f.flush()
         os.fsync(f.fileno())
+
 
 # --------- Генерация HTML ---------
 def generate_html(selected_node=None):
@@ -41,6 +44,20 @@ def generate_html(selected_node=None):
     except Exception as e:
         st.error(f"⚠️ Не удалось запустить генерацию: {e}")
 
+
+# --------- Универсальная текстовая очистка ---------
+def textify(value):
+    """Принудительно превращает все значения и заголовки в строки, без изменения порядка."""
+    if isinstance(value, dict):
+        # сохраняем порядок ключей
+        return {str(k): textify(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [textify(v) for v in value]
+    if value is None:
+        return ""
+    return str(value)
+
+
 # --------- Создание Excel-шаблона узла ---------
 def make_excel(node: dict) -> BytesIO:
     """Создаёт Excel-файл с данными узла и таблицей колонок, начиная с 7-й строки."""
@@ -51,34 +68,36 @@ def make_excel(node: dict) -> BytesIO:
         ws = writer.sheets[sheet_name]
 
         ws["A1"] = "Узел данных"
-        ws["A2"] = "name"; ws["B2"] = node.get("name", "")
-        ws["A3"] = "layer"; ws["B3"] = node.get("layer", "")
-        ws["A4"] = "type"; ws["B4"] = node.get("type", "")
-        ws["A5"] = "comment"; ws["B5"] = node.get("comment", "")
+        ws["A2"] = "name"; ws["B2"] = str(node.get("name", ""))
+        ws["A3"] = "layer"; ws["B3"] = str(node.get("layer", ""))
+        ws["A4"] = "type"; ws["B4"] = str(node.get("type", ""))
+        ws["A5"] = "comment"; ws["B5"] = str(node.get("comment", ""))
 
         ws["A7"] = "Таблица колонок:"
-        headers = ["name", "type", "description", "comment"]
-        for i, h in enumerate(headers, start=1):
-            ws.cell(row=8, column=i, value=h)
 
-        cols = pd.DataFrame(node.get("columns", []))
-        if cols.empty:
-            cols = pd.DataFrame(columns=headers)
+        # сохраняем порядок колонок как в YAML
+        cols = pd.DataFrame(textify(node.get("columns", [])))
+        cols = cols.fillna("").astype(str)
+        cols.columns = cols.columns.map(str)
+
+        headers = list(cols.columns) if not cols.empty else ["name", "type", "description", "comment"]
+        for i, h in enumerate(headers, start=1):
+            ws.cell(row=8, column=i, value=str(h))
 
         for r, row in enumerate(cols.itertuples(index=False), start=9):
             for c, value in enumerate(row, start=1):
-                ws.cell(row=r, column=c, value=value)
+                ws.cell(row=r, column=c, value=str(value))
 
     buffer.seek(0)
     return buffer
 
-# --------- Санитизация таблицы (во избежание Arrow ошибок) ---------
+
+# --------- Санитизация таблицы ---------
 def sanitize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
-    if df.empty:
-        return pd.DataFrame(columns=["name", "type", "description", "comment"])
     df = df.fillna("").astype(str)
     df.columns = df.columns.map(str)
     return df
+
 
 # --------- Интерфейс Streamlit ---------
 st.set_page_config(page_title="Data Flow Visualizer Editor", layout="wide")
@@ -128,8 +147,6 @@ if node:
 
             # --- Читаем таблицу колонок с гибким числом столбцов ---
             start_row = 9
-
-            # Определяем, сколько реально есть заголовков (до первой пустой ячейки в строке 8)
             headers = []
             col = 1
             while True:
@@ -139,7 +156,6 @@ if node:
                 headers.append(str(val).strip())
                 col += 1
 
-            # Если вообще нет заголовков — используем стандартные
             if not headers:
                 headers = ["name", "type", "description", "comment"]
 
@@ -147,11 +163,12 @@ if node:
             data_rows = []
             for r in range(start_row, ws.max_row + 1):
                 row_data = {h: ws.cell(row=r, column=i + 1).value for i, h in enumerate(headers)}
-                if any(v is not None for v in row_data.values()):
+                if any(v is not None and str(v).strip() != "" for v in row_data.values()):
                     data_rows.append(row_data)
 
-            # Приводим к чистому виду (без NaN и смешанных типов)
-            cols_df = sanitize_dataframe(pd.DataFrame(data_rows, columns=headers))
+            # Принудительно текстовые значения, сохраняем порядок
+            cols_df = pd.DataFrame(data_rows, columns=headers)
+            cols_df = cols_df.fillna("").astype(str)
 
             # Обновляем YAML
             new_name = str(name).strip() or selected_node_name
@@ -160,14 +177,16 @@ if node:
                 "layer": str(layer).strip(),
                 "type": str(type_).strip(),
                 "comment": str(comment).strip(),
-                "columns": cols_df.to_dict(orient="records"),
+                "columns": textify(cols_df.to_dict(orient="records")),
             }
 
+            # Проверяем уникальность
             existing_names = [n["name"] for n in data_model["nodes"]]
             if new_name != selected_node_name and new_name in existing_names:
                 st.error(f"❌ Узел с именем '{new_name}' уже существует.")
                 st.stop()
 
+            # Заменяем старый узел
             replaced = False
             for i, n in enumerate(data_model["nodes"]):
                 if n.get("name") == selected_node_name:
@@ -177,7 +196,7 @@ if node:
             if not replaced:
                 data_model["nodes"].append(updated_node)
 
-            # 💾 Сохраняем YAML и сразу перегенерируем HTML
+            # 💾 Сохраняем YAML и перегенерируем HTML
             save_yaml(CONFIG_PATH, data_model)
             generate_html(selected_node_name)
 

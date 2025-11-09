@@ -10,7 +10,7 @@
   #details {flex:1;background:#141414;padding:12px;overflow-y:auto;border-left:2px solid #222;}
   #filter {padding:10px;border-bottom:1px solid #333;background:#1d1d1d;}
   table {border-collapse:collapse;width:100%;font-size:13px;margin-top:8px;}
-  th,td {border:1px solid #333;padding:4px 6px;}
+  th,td {border:1px solid #333;padding:4px 6px;word-break:break-word;}
   th {background:#222;color:#ffdf6b;}
 </style>
 </head>
@@ -34,72 +34,98 @@
 </div>
   <div id="info"><p>Нажмите на узел или стрелку</p></div>
 </div>
-<script id="NODE_DATA" type="application/json">{"Catalog_input": {"layer": "11111", "type": "ваввв", "comment": "Основной справочник материалов и узлов для проекта.", "columns": [{"name": "ngcjghc", "type": "TEXT", "description": "Код монтажной зоны", "comment": "Используется для группировки деталей", "new": ""}, {"name": "3", "type": "Number10", "description": "Тип материала", "comment": "Поле из ERP каталога", "new": "1"}, {"name": "ggg", "type": "TEXT", "description": "Поставщик", "comment": "Указывается при импорте каталога", "new": "1"}, {"name": "5", "type": "", "description": "", "comment": "", "new": "2"}, {"name": "чапрпачр", "type": "чапр", "description": "ачрр", "comment": "", "new": "dgdf"}, {"name": "чапрчар", "type": "", "description": "апр", "comment": "", "new": ""}, {"name": "", "type": "", "description": "пррп", "comment": "", "new": ""}, {"name": "", "type": "", "description": "прп", "comment": "", "new": ""}]}, "Saved_progress": {"layer": "SharePoint", "type": "Excel", "comment": "Статусы выполнения работ по сборочным зонам.", "columns": [{"name": "LOT", "type": "TEXT", "description": "Код сборочной партии", "comment": "Связан с Catalog_input.LOT"}, {"name": "Progress_Status", "type": "TEXT", "description": "Статус выполнения", "comment": "Например: 'In progress', 'Done'"}, {"name": "Updated_On", "type": "DATE", "description": "Дата обновления статуса", "comment": "Автоматически из SharePoint"}]}, "Work_Hours": {"layer": "SharePoint", "type": "Excel", "comment": "Учёт рабочих часов по LOT и зонам.", "columns": [{"name": "LOT4", "type": "TEXT", "description": "Идентификатор партии", "comment": "Ключ для объединения"}, {"name": "Employee_ID", "type": "TEXT", "description": "Код работника", "comment": "Уникальный идентификатор сотрудника"}, {"name": "Hours", "type": "FLOAT", "description": "Количество часов", "comment": "Указывается вручную или из WMS"}, {"name": "Updated_On", "type": "DATE", "description": "Дата учёта", "comment": "Дата фиксации рабочих часов"}]}, "Merged_Spool_Data": {"layer": "PowerQuery", "type": "Table2", "comment": "Объединённая таблица с материалами, статусами и часами.", "columns": [{"name": "LOT", "type": "TEXT", "description": "Ключ LOT", "comment": "Импортировано из Catalog_input"}, {"name": "MFZ", "type": "TEXT", "description": "Код сборочной зоны", "comment": "Импортировано из Catalog_input"}, {"name": "Progress_Status", "type": "TEXT", "description": "Статус выполнения", "comment": "Из Saved_progress"}, {"name": "Hours", "type": "FLOAT", "description": "Фактическое количество часов", "comment": "Из Work_Hours"}, {"name": "Weight", "type": "FLOAT", "description": "Вес сборки", "comment": "Вычисляется автоматически в PQ"}, {"name": 1, "type": "", "description": "", "comment": ""}, {"name": 2, "type": "", "description": "", "comment": ""}, {"name": 3, "type": "", "description": "", "comment": ""}, {"name": 4, "type": "", "description": "", "comment": ""}]}, "Transfer_Orders": {"layer": "Output", "type": "Report", "comment": "Финальный отчёт с данными о партиях, статусах и трудозатратах.", "columns": [{"name": "LOT", "type": "TEXT", "description": "Ключ сборки", "comment": "Из Merged_Spool_Data.LOT"}, {"name": "Warehouse", "type": "TEXT", "description": "Склад", "comment": "Заполняется вручную"}, {"name": "Progress_Status", "type": "TEXT", "description": "Статус", "comment": "Из Saved_progress"}, {"name": "Total_Hours", "type": "FLOAT", "description": "Общее количество часов", "comment": "Агрегируется из Work_Hours"}, {"name": "Weight", "type": "FLOAT", "description": "Вес", "comment": "Из Merged_Spool_Data.Weight"}]}}</script>
+
+<script id="NODE_DATA" type="application/json">{"Catalog_input": {"layer": "11111", "type": "ваввв", "comment": "Основной справочник материалов и узлов для проекта.", "columns": [{"comment": "ngcjghc", "description": "TEXT", "name2": "Код монтажной зоны", "type": "1", "пва": "", "test1": "", "test2": "", "test3": "", "test4": "", "test5": "", "test6": "", "test7": "", "test8": "", "test9": ""}, {"comment": "3", "description": "Number10", "name2": "Тип материала", "type": "1", "пва": "", "test1": "", "test2": "", "test3": "g", "test4": "", "test5": "", "test6": "", "test7": "", "test8": "", "test9": ""}, {"comment": "ggg", "description": "TEXT", "name2": "Поставщик", "type": "2", "пва": "", "test1": "", "test2": "", "test3": "", "test4": "", "test5": "", "test6": "", "test7": "", "test8": "", "test9": ""}, {"comment": "5", "description": "", "name2": "", "type": "2", "пва": "", "test1": "", "test2": "", "test3": "", "test4": "", "test5": "", "test6": "", "test7": "", "test8": "", "test9": ""}, {"comment": "чапрпачр", "description": "чапр", "name2": "ачрр", "type": "dgdf", "пва": "", "test1": "", "test2": "", "test3": "", "test4": "", "test5": "", "test6": "", "test7": "", "test8": "", "test9": ""}, {"comment": "чапрчар", "description": "", "name2": "апр", "type": "", "пва": "", "test1": "", "test2": "", "test3": "", "test4": "", "test5": "", "test6": "", "test7": "", "test8": "", "test9": ""}, {"comment": "", "description": "", "name2": "пррп", "type": "", "пва": "", "test1": "", "test2": "", "test3": "", "test4": "", "test5": "", "test6": "g", "test7": "", "test8": "", "test9": "g"}, {"comment": "", "description": "", "name2": "прп", "type": "", "пва": "", "test1": "", "test2": "", "test3": "", "test4": "", "test5": "", "test6": "", "test7": "", "test8": "", "test9": ""}]}, "Saved_progress": {"layer": "SharePoint", "type": "Excel", "comment": "Статусы выполнения работ по сборочным зонам.", "columns": [{"name": "LOT", "type": "TEXT", "description": "Код сборочной партии", "comment": "Связан с Catalog_input.LOT"}, {"name": "Progress_Status", "type": "TEXT", "description": "Статус выполнения", "comment": "Например: 'In progress', 'Done'"}, {"name": "Updated_On", "type": "DATE", "description": "Дата обновления статуса", "comment": "Автоматически из SharePoint"}]}, "Work_Hours": {"layer": "SharePoint", "type": "Excel", "comment": "Учёт рабочих часов по LOT и зонам.", "columns": [{"name": "LOT4", "type": "TEXT", "description": "Идентификатор партии", "comment": "Ключ для объединения"}, {"name": "Employee_ID", "type": "TEXT", "description": "Код работника", "comment": "Уникальный идентификатор сотрудника"}, {"name": "Hours", "type": "FLOAT", "description": "Количество часов", "comment": "Указывается вручную или из WMS"}, {"name": "Updated_On", "type": "DATE", "description": "Дата учёта", "comment": "Дата фиксации рабочих часов"}]}, "Merged_Spool_Data": {"layer": "PowerQuery", "type": "Table2", "comment": "Объединённая таблица с материалами, статусами и часами.", "columns": [{"name": "LOT", "type": "TEXT", "description": "Ключ LOT", "comment": "Импортировано из Catalog_input"}, {"name": "MFZ", "type": "TEXT", "description": "Код сборочной зоны", "comment": "Импортировано из Catalog_input"}, {"name": "Progress_Status", "type": "TEXT", "description": "Статус выполнения", "comment": "Из Saved_progress"}, {"name": "Hours", "type": "FLOAT", "description": "Фактическое количество часов", "comment": "Из Work_Hours"}, {"name": "Weight", "type": "FLOAT", "description": "Вес сборки", "comment": "Вычисляется автоматически в PQ"}, {"name": "1", "type": "", "description": "", "comment": ""}, {"name": "2", "type": "", "description": "", "comment": ""}, {"name": "3", "type": "", "description": "", "comment": ""}, {"name": "4", "type": "", "description": "", "comment": ""}]}, "Transfer_Orders": {"layer": "Output", "type": "Report", "comment": "Финальный отчёт с данными о партиях, статусах и трудозатратах.", "columns": [{"name": "LOT", "type": "TEXT", "description": "Ключ сборки", "comment": "Из Merged_Spool_Data.LOT"}, {"name": "Warehouse", "type": "TEXT", "description": "Склад", "comment": "Заполняется вручную"}, {"name": "Progress_Status", "type": "TEXT", "description": "Статус", "comment": "Из Saved_progress"}, {"name": "Total_Hours", "type": "FLOAT", "description": "Общее количество часов", "comment": "Агрегируется из Work_Hours"}, {"name": "Weight", "type": "FLOAT", "description": "Вес", "comment": "Из Merged_Spool_Data.Weight"}]}}</script>
 <script id="VIS_NODES" type="application/json">[{"id": "Catalog_input", "label": "Catalog_input\n(11111)", "group": "11111"}, {"id": "Saved_progress", "label": "Saved_progress\n(SharePoint)", "group": "SharePoint"}, {"id": "Work_Hours", "label": "Work_Hours\n(SharePoint)", "group": "SharePoint"}, {"id": "Merged_Spool_Data", "label": "Merged_Spool_Data\n(PowerQuery)", "group": "PowerQuery"}, {"id": "Transfer_Orders", "label": "Transfer_Orders\n(Output)", "group": "Output"}]</script>
 <script id="VIS_EDGES" type="application/json">[{"id": "edge_0_Catalog_input_Merged_Spool_Data", "from": "Catalog_input", "to": "Merged_Spool_Data", "transfer": [["LOT", "LOT → Merged_Spool_Data.LOT"], ["MFZ", "MFZ → Merged_Spool_Data.MFZ"]], "transfer_type": "pq", "data_type": "materials", "color": "rgba(166, 216, 84, 1.0)", "dashes": false, "arrows": {"to": {"enabled": true, "type": "arrow", "scaleFactor": 0.8}}, "length": 250}, {"id": "edge_1_Saved_progress_Merged_Spool_Data", "from": "Saved_progress", "to": "Merged_Spool_Data", "transfer": [["Progress_Status", "Progress_Status → Merged_Spool_Data.Progress_Status"]], "transfer_type": "pq", "data_type": "progress", "color": "rgba(252, 141, 98, 1.0)", "dashes": false, "arrows": {"to": {"enabled": true, "type": "arrow", "scaleFactor": 0.8}}, "length": 250}, {"id": "edge_2_Work_Hours_Merged_Spool_Data", "from": "Work_Hours", "to": "Merged_Spool_Data", "transfer": [["LOT", "LOT → Merged_Spool_Data.LOT"], ["Hours", "Hours → Merged_Spool_Data.Hours"]], "transfer_type": "pq", "data_type": "hours", "color": "rgba(141, 160, 203, 1.0)", "dashes": false, "arrows": {"to": {"enabled": true, "type": "arrow", "scaleFactor": 0.8}}, "length": 250}, {"id": "edge_3_Merged_Spool_Data_Transfer_Orders", "from": "Merged_Spool_Data", "to": "Transfer_Orders", "transfer": [["LOT", "LOT → Transfer_Orders.LOT"], ["Warehouse", "Warehouse → Transfer_Orders.Warehouse"]], "transfer_type": "manual", "data_type": "cost", "color": "rgba(231, 138, 195, 1.0)", "dashes": true, "arrows": {"to": {"enabled": true, "type": "arrow", "scaleFactor": 0.8}}, "length": 250}, {"id": "edge_4_Saved_progress_Transfer_Orders", "from": "Saved_progress", "to": "Transfer_Orders", "transfer": [["Progress_Status", "Progress_Status → Transfer_Orders.Progress_Status"]], "transfer_type": "planned", "data_type": "documents", "color": "rgba(255, 217, 47, 0.3)", "dashes": false, "arrows": {"to": {"enabled": true, "type": "arrow", "scaleFactor": 0.8}}, "length": 250}, {"id": "edge_5_Work_Hours_Transfer_Orders", "from": "Work_Hours", "to": "Transfer_Orders", "transfer": [["Employee_ID", "Employee_ID → Transfer_Orders.Total_Hours"]], "transfer_type": "pq", "data_type": "workers", "color": "rgba(102, 194, 165, 1.0)", "dashes": false, "arrows": {"to": {"enabled": true, "type": "arrow", "scaleFactor": 0.8}}, "length": 250}]</script>
+
 <script>
-const nodeData = JSON.parse(document.getElementById("NODE_DATA").textContent);
-const nodesRaw = JSON.parse(document.getElementById("VIS_NODES").textContent);
-const edgesRaw = JSON.parse(document.getElementById("VIS_EDGES").textContent);
+function asText(v) {
+  if (v === null || v === undefined) return "";
+  return String(v);
+}
+
+const nodeData = JSON.parse(document.getElementById("NODE_DATA").textContent || "{}");
+const nodesRaw = JSON.parse(document.getElementById("VIS_NODES").textContent || "[]");
+const edgesRaw = JSON.parse(document.getElementById("VIS_EDGES").textContent || "[]");
+
 const nodes = new vis.DataSet(nodesRaw);
 const edges = new vis.DataSet(edgesRaw);
 const container = document.getElementById("mynetwork");
-const network = new vis.Network(container,{nodes,edges},{
-  physics:{enabled:true,barnesHut:{gravitationalConstant:-3000}},
-  nodes:{shape:"box",font:{color:"#0e0e0e",size:14},borderWidth:1,margin:10,color:{background:"#1b1b1b",border:"#333"}},
-  edges:{smooth:{type:"cubicBezier"},width:1.4}
+
+const network = new vis.Network(container, { nodes, edges }, {
+  physics: { enabled: true, barnesHut: { gravitationalConstant: -3000 } },
+  nodes: { shape: "box", font: { color: "#0e0e0e", size: 14 }, borderWidth: 1, margin: 10,
+           color: { background: "#1b1b1b", border: "#333" } },
+  edges: { smooth: { type: "cubicBezier" }, width: 1.4 }
 });
-const info=document.getElementById("info");
-network.on("click",p=>{
- if (p.nodes.length > 0) {
-  const id = p.nodes[0];
-  const n = nodeData[id];
-  if (!n) { info.innerHTML = `<h3>${id}</h3>`; return; }
 
-  let html = `<h3>${id}</h3>
-              <p><b>Тип:</b> ${n.type}</p>
-              <p><b>Слой:</b> ${n.layer}</p>
-              <p>${n.comment}</p>`;
+const info = document.getElementById("info");
 
-  if (n.columns && n.columns.length) {
-    html += `<table>
-      <tr><th>Колонка</th><th>Тип данных</th><th>Описание</th><th>Комментарий</th></tr>`;
-    n.columns.forEach(c => {
-      html += `<tr>
-        <td>${c.name || "-"}</td>
-        <td>${c.type || "-"}</td>
-        <td>${c.description || "-"}</td>
-        <td>${c.comment || "-"}</td>
-      </tr>`;
-    });
-    html += `</table>`;
+network.on("click", p => {
+  if (p.nodes.length > 0) {
+    const id = p.nodes[0];
+    const n = nodeData[id];
+    if (!n) { info.innerHTML = `<h3>${asText(id)}</h3>`; return; }
+
+    let html = `<h3>${asText(id)}</h3>
+                <p><b>Тип:</b> ${asText(n.type)}</p>
+                <p><b>Слой:</b> ${asText(n.layer)}</p>
+                <p>${asText(n.comment)}</p>`;
+
+    if (n.columns && n.columns.length) {
+      // ✅ Берем порядок колонок из первой строки, без сортировки
+      const keys = Object.keys(n.columns[0]);
+
+      html += "<table><thead><tr>";
+      keys.forEach(k => html += `<th>${asText(k)}</th>`);
+      html += "</tr></thead><tbody>";
+
+      n.columns.forEach(row => {
+        html += "<tr>";
+        keys.forEach(k => html += `<td>${asText(row[k])}</td>`);
+        html += "</tr>";
+      });
+
+      html += "</tbody></table>";
+    } else {
+      html += "<p><i>Нет данных о колонках</i></p>";
+    }
+
+    info.innerHTML = html;
   }
-
-  info.innerHTML = html;
-}
- else if(p.edges.length>0){
-  const e=edges.get(p.edges[0]);
-  let html=`<h3>${e.from} → ${e.to}</h3><p><b>Тип передачи:</b> ${e.transfer_type}</p><p><b>Тип данных:</b> ${e.data_type}</p>`;
-  if(e.transfer&&e.transfer.length){html+=`<table><tr><th>Поле</th><th>Описание</th></tr>`;e.transfer.forEach(t=>html+=`<tr><td>${t[0]}</td><td>${t[1]}</td></tr>`);html+=`</table>`;}
-  info.innerHTML=html;
- }
+  else if (p.edges.length > 0) {
+    const e = edges.get(p.edges[0]);
+    let html = `<h3>${asText(e.from)} → ${asText(e.to)}</h3>
+                <p><b>Тип передачи:</b> ${asText(e.transfer_type)}</p>
+                <p><b>Тип данных:</b> ${asText(e.data_type)}</p>`;
+    if (e.transfer && e.transfer.length) {
+      html += `<table><tr><th>Поле</th><th>Описание</th></tr>`;
+      e.transfer.forEach(t => html += `<tr><td>${asText(t[0])}</td><td>${asText(t[1])}</td></tr>`);
+      html += `</table>`;
+    }
+    info.innerHTML = html;
+  }
 });
-// ---- новый универсальный фильтр ----
+
+// ---- фильтры ----
 function applyFilters() {
   const activeData = Array.from(document.querySelectorAll('.dtype:checked')).map(c => c.value);
   const activeTransfer = Array.from(document.querySelectorAll('.ttype:checked')).map(c => c.value);
-
   edgesRaw.forEach(e => {
     const visible = activeData.includes(e.data_type) && activeTransfer.includes(e.transfer_type);
     edges.update({ id: e.id, hidden: !visible });
   });
 }
+document.querySelectorAll('.dtype, .ttype').forEach(chk => chk.addEventListener('change', applyFilters));
 
-// слушатели для обоих фильтров
-document.querySelectorAll('.dtype, .ttype').forEach(chk => {
-  chk.addEventListener('change', applyFilters);
-});
-
+function highlightNode(nodeName) {
+  if (!nodes.getIds().includes(nodeName)) return;
+  network.selectNodes([nodeName]);
+  network.focus(nodeName, { scale: 1.1, animation: true });
+}
+window.highlightNode = highlightNode;
 </script>
+
 </body>
 </html>
