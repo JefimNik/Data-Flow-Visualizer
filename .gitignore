@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+
+# Build output
+#Data_Flow_Visualizer/build/
+data_lineage_viz/
+lib/
+.venv
+*.zip
+
+# Logs
+Data_Flow_Visualizer/docs/build_log.txt
+/data_lineage_viz/
