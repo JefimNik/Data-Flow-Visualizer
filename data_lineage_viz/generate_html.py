@@ -18,57 +18,40 @@ def main():
         for sh in n.get("sheets", []) or []:
             for c in sh.get("columns", []) or []:
                 cols.append({
-                    "Sheet": sh.get("name",""),
-                    "Column": c.get("name",""),
-                    "Link": c.get("link",""),
-                    "Comment": c.get("comment",""),
+                    "Sheet": sh.get("name", ""),
+                    "Column": c.get("name", ""),
+                    "Link": c.get("link", ""),
+                    "Comment": c.get("comment", ""),
                 })
         node_data[n["name"]] = {
-            "layer": n.get("layer",""),
-            "type": n.get("type",""),
-            "comment": n.get("comment",""),
-            "columns": cols
+            "layer": n.get("layer", ""),
+            "type": n.get("type", ""),
+            "comment": n.get("comment", ""),
+            "columns": cols,
         }
 
-    # --- узлы для визуализации ---
-    vis_nodes = []
-    for n in nodes_in:
-        label = f"{n['name']}\n({n.get('layer','')})"
-        vis_nodes.append({
-            "id": n["name"],
-            "label": label,
-            "group": n.get("layer",""),
-        })
-
-    # --- типы стрелок ---
-    edge_styles = {
-        "normal":          {"color": "rgba(180,180,180,1)",   "dashes": False, "type": "arrow"},
-        "manual":          {"color": "rgba(255,223,107,1)",   "dashes": True,  "type": "arrow"},
-        "planned":         {"color": "rgba(150,150,150,0.25)","dashes": False, "type": "arrow"},
-        "normal_diamond":  {"color": "rgba(180,180,180,1)",   "dashes": False, "type": "diamond"},
-        "normal_bar":      {"color": "rgba(180,180,180,1)",   "dashes": False, "type": "bar"},
-    }
+    vis_nodes = [
+        {"id": n["name"], "label": f"{n['name']}\n({n.get('layer','')})", "group": n.get("layer", "")}
+        for n in nodes_in
+    ]
 
     vis_edges = []
-    for e in edges_in:
-        etype = e.get("type", "normal")
-        style = edge_styles.get(etype, edge_styles["normal"])
+    for i, e in enumerate(edges_in):
         vis_edges.append({
+            "id": f"edge_{i}_{e['from']}_{e['to']}",
             "from": e["from"],
             "to": e["to"],
-            "arrows": { "to": { "enabled": True, "type": style["type"], "scaleFactor": 0.7 } },
-            "color": style["color"],
-            "dashes": style["dashes"],
-            "type": etype,
-            "transfer": e.get("transfer", [])
+            "transfer": e.get("transfer", []),
+            "transfer_type": e.get("transfer_type", "pq"),
+            "data_type": e.get("data_type", "general"),
+            "color": "rgba(200,200,200,1)",
+            "arrows": {"to": {"enabled": True, "type": "arrow"}},
+            "length": 250
         })
 
-    html = (
-        tpl
-        .replace("__NODE_DATA__", json.dumps(node_data, ensure_ascii=False))
-        .replace("__VIS_NODES__", json.dumps(vis_nodes, ensure_ascii=False))
-        .replace("__VIS_EDGES__", json.dumps(vis_edges, ensure_ascii=False))
-    )
+    html = tpl.replace("__NODE_DATA__", json.dumps(node_data, ensure_ascii=False))
+    html = html.replace("__VIS_NODES__", json.dumps(vis_nodes, ensure_ascii=False))
+    html = html.replace("__VIS_EDGES__", json.dumps(vis_edges, ensure_ascii=False))
 
     pathlib.Path(OUTPUT).write_text(html, encoding="utf-8")
     print(f"✅ Сгенерировано: {pathlib.Path(OUTPUT).resolve()}")
