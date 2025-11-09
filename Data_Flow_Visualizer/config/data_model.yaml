@@ -7,7 +7,7 @@ nodes:
   type: Excel
   comment: Основной справочник материалов и узлов для проекта.
   columns:
-  - name: LOT5
+  - name: LOT6
     type: TEXT
     description: Код сборочной партии (LOT)
     comment: Основное поле для объединения данных

@@ -69,6 +69,7 @@ with col2:
         gb = GridOptionsBuilder.from_dataframe(columns_df)
         gb.configure_default_column(editable=True, wrapText=True, autoHeight=True, resizable=True)
         gb.configure_grid_options(enableRangeSelection=True, rowSelection="single")
+        gb.configure_grid_options(stopEditingWhenCellsLoseFocus=True)
         gb.configure_side_bar()
         grid_options = gb.build()
 
