@@ -17,15 +17,21 @@
 <body>
 <div id="mynetwork"></div>
 <div id="details">
-  <div id="filter">
-    <b>Фильтр по типу данных:</b><br>
-    <label><input type="checkbox" class="dtype" value="workers" checked> workers</label><br>
-    <label><input type="checkbox" class="dtype" value="progress" checked> progress</label><br>
-    <label><input type="checkbox" class="dtype" value="hours" checked> hours</label><br>
-    <label><input type="checkbox" class="dtype" value="cost" checked> cost</label><br>
-    <label><input type="checkbox" class="dtype" value="materials" checked> materials</label><br>
-    <label><input type="checkbox" class="dtype" value="documents" checked> documents</label><br>
-  </div>
+<div id="filter">
+  <b>Фильтр по типу данных:</b><br>
+  <label><input type="checkbox" class="dtype" value="materials" checked> materials</label><br>
+  <label><input type="checkbox" class="dtype" value="progress" checked> progress</label><br>
+  <label><input type="checkbox" class="dtype" value="hours" checked> hours</label><br>
+  <label><input type="checkbox" class="dtype" value="cost" checked> cost</label><br>
+  <label><input type="checkbox" class="dtype" value="workers" checked> workers</label><br>
+  <label><input type="checkbox" class="dtype" value="documents" checked> documents</label><br>
+
+  <hr style="margin:8px 0;border:0;border-top:1px solid #333">
+  <b>Фильтр по типу передачи:</b><br>
+  <label><input type="checkbox" class="ttype" value="pq" checked> pq</label><br>
+  <label><input type="checkbox" class="ttype" value="manual" checked> manual</label><br>
+  <label><input type="checkbox" class="ttype" value="planned" checked> planned</label><br>
+</div>
   <div id="info"><p>Нажмите на узел или стрелку</p></div>
 </div>
 <script id="NODE_DATA" type="application/json">__NODE_DATA__</script>
@@ -78,12 +84,22 @@ network.on("click",p=>{
   info.innerHTML=html;
  }
 });
-document.querySelectorAll('.dtype').forEach(chk=>{
- chk.addEventListener('change',()=>{
-  const active=Array.from(document.querySelectorAll('.dtype:checked')).map(c=>c.value);
-  edgesRaw.forEach(e=>edges.update({id:e.id,hidden:!active.includes(e.data_type)}));
- });
+// ---- новый универсальный фильтр ----
+function applyFilters() {
+  const activeData = Array.from(document.querySelectorAll('.dtype:checked')).map(c => c.value);
+  const activeTransfer = Array.from(document.querySelectorAll('.ttype:checked')).map(c => c.value);
+
+  edgesRaw.forEach(e => {
+    const visible = activeData.includes(e.data_type) && activeTransfer.includes(e.transfer_type);
+    edges.update({ id: e.id, hidden: !visible });
+  });
+}
+
+// слушатели для обоих фильтров
+document.querySelectorAll('.dtype, .ttype').forEach(chk => {
+  chk.addEventListener('change', applyFilters);
 });
+
 </script>
 </body>
 </html>

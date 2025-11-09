@@ -17,15 +17,21 @@
 <body>
 <div id="mynetwork"></div>
 <div id="details">
-  <div id="filter">
-    <b>Фильтр по типу данных:</b><br>
-    <label><input type="checkbox" class="dtype" value="workers" checked> workers</label><br>
-    <label><input type="checkbox" class="dtype" value="progress" checked> progress</label><br>
-    <label><input type="checkbox" class="dtype" value="hours" checked> hours</label><br>
-    <label><input type="checkbox" class="dtype" value="cost" checked> cost</label><br>
-    <label><input type="checkbox" class="dtype" value="materials" checked> materials</label><br>
-    <label><input type="checkbox" class="dtype" value="documents" checked> documents</label><br>
-  </div>
+<div id="filter">
+  <b>Фильтр по типу данных:</b><br>
+  <label><input type="checkbox" class="dtype" value="materials" checked> materials</label><br>
+  <label><input type="checkbox" class="dtype" value="progress" checked> progress</label><br>
+  <label><input type="checkbox" class="dtype" value="hours" checked> hours</label><br>
+  <label><input type="checkbox" class="dtype" value="cost" checked> cost</label><br>
+  <label><input type="checkbox" class="dtype" value="workers" checked> workers</label><br>
+  <label><input type="checkbox" class="dtype" value="documents" checked> documents</label><br>
+
+  <hr style="margin:8px 0;border:0;border-top:1px solid #333">
+  <b>Фильтр по типу передачи:</b><br>
+  <label><input type="checkbox" class="ttype" value="pq" checked> pq</label><br>
+  <label><input type="checkbox" class="ttype" value="manual" checked> manual</label><br>
+  <label><input type="checkbox" class="ttype" value="planned" checked> planned</label><br>
+</div>
   <div id="info"><p>Нажмите на узел или стрелку</p></div>
 </div>
 <script id="NODE_DATA" type="application/json">{"Catalog_input": {"layer": "SharePoint", "type": "Excel", "comment": "Основной справочник материалов и узлов для проекта.", "columns": [{"name": "LOT", "type": "TEXT", "description": "Код сборочной партии (LOT)", "comment": "Основное поле для объединения данных"}, {"name": "MFZ", "type": "TEXT", "description": "Код монтажной зоны", "comment": "Используется для группировки деталей"}, {"name": "Material", "type": "TEXT", "description": "Тип материала", "comment": "Поле из ERP каталога"}, {"name": "Supplier", "type": "TEXT", "description": "Поставщик", "comment": "Указывается при импорте каталога"}]}, "Saved_progress": {"layer": "SharePoint", "type": "Excel", "comment": "Статусы выполнения работ по сборочным зонам.", "columns": [{"name": "LOT", "type": "TEXT", "description": "Код сборочной партии", "comment": "Связан с Catalog_input.LOT"}, {"name": "Progress_Status", "type": "TEXT", "description": "Статус выполнения", "comment": "Например: 'In progress', 'Done'"}, {"name": "Updated_On", "type": "DATE", "description": "Дата обновления статуса", "comment": "Автоматически из SharePoint"}]}, "Work_Hours": {"layer": "SharePoint", "type": "Excel", "comment": "Учёт рабочих часов по LOT и зонам.", "columns": [{"name": "LOT", "type": "TEXT", "description": "Идентификатор партии", "comment": "Ключ для объединения"}, {"name": "Employee_ID", "type": "TEXT", "description": "Код работника", "comment": "Уникальный идентификатор сотрудника"}, {"name": "Hours", "type": "FLOAT", "description": "Количество часов", "comment": "Указывается вручную или из WMS"}, {"name": "Updated_On", "type": "DATE", "description": "Дата учёта", "comment": "Дата фиксации рабочих часов"}]}, "Merged_Spool_Data": {"layer": "PowerQuery", "type": "Table", "comment": "Объединённая таблица с материалами, статусами и часами.", "columns": [{"name": "LOT", "type": "TEXT", "description": "Ключ LOT", "comment": "Импортировано из Catalog_input"}, {"name": "MFZ", "type": "TEXT", "description": "Код сборочной зоны", "comment": "Импортировано из Catalog_input"}, {"name": "Progress_Status", "type": "TEXT", "description": "Статус выполнения", "comment": "Из Saved_progress"}, {"name": "Hours", "type": "FLOAT", "description": "Фактическое количество часов", "comment": "Из Work_Hours"}, {"name": "Weight", "type": "FLOAT", "description": "Вес сборки", "comment": "Вычисляется автоматически в PQ"}]}, "Transfer_Orders": {"layer": "Output", "type": "Report", "comment": "Финальный отчёт с данными о партиях, статусах и трудозатратах.", "columns": [{"name": "LOT", "type": "TEXT", "description": "Ключ сборки", "comment": "Из Merged_Spool_Data.LOT"}, {"name": "Warehouse", "type": "TEXT", "description": "Склад", "comment": "Заполняется вручную"}, {"name": "Progress_Status", "type": "TEXT", "description": "Статус", "comment": "Из Saved_progress"}, {"name": "Total_Hours", "type": "FLOAT", "description": "Общее количество часов", "comment": "Агрегируется из Work_Hours"}, {"name": "Weight", "type": "FLOAT", "description": "Вес", "comment": "Из Merged_Spool_Data.Weight"}]}}</script>
@@ -78,12 +84,22 @@ network.on("click",p=>{
   info.innerHTML=html;
  }
 });
-document.querySelectorAll('.dtype').forEach(chk=>{
- chk.addEventListener('change',()=>{
-  const active=Array.from(document.querySelectorAll('.dtype:checked')).map(c=>c.value);
-  edgesRaw.forEach(e=>edges.update({id:e.id,hidden:!active.includes(e.data_type)}));
- });
+// ---- новый универсальный фильтр ----
+function applyFilters() {
+  const activeData = Array.from(document.querySelectorAll('.dtype:checked')).map(c => c.value);
+  const activeTransfer = Array.from(document.querySelectorAll('.ttype:checked')).map(c => c.value);
+
+  edgesRaw.forEach(e => {
+    const visible = activeData.includes(e.data_type) && activeTransfer.includes(e.transfer_type);
+    edges.update({ id: e.id, hidden: !visible });
+  });
+}
+
+// слушатели для обоих фильтров
+document.querySelectorAll('.dtype, .ttype').forEach(chk => {
+  chk.addEventListener('change', applyFilters);
 });
+
 </script>
 </body>
 </html>
