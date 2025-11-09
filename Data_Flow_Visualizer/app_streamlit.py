@@ -4,7 +4,6 @@ import pandas as pd
 import yaml
 import pathlib
 import subprocess
-import tempfile
 
 # --------- Настройки страницы ---------
 st.set_page_config(page_title="Data Flow Visualizer Editor", layout="wide")
@@ -86,21 +85,26 @@ with col2:
 
         updated_data = grid_response["data"].to_dict(orient="records")
 
-        # кнопки
+        # ---- Одна кнопка: сохранить + перегенерировать + обновить ----
         st.markdown("---")
-        col_s, col_a = st.columns([1, 1])
-        if col_s.button("💾 Сохранить изменения"):
-            node["columns"] = updated_data
-            save_yaml(CONFIG_PATH, data_model)
-            st.success("✅ Изменения сохранены")
-            data_model = load_yaml(CONFIG_PATH)
-            node = next((n for n in data_model["nodes"] if n["name"] == selected_node_name), None)
-
-        if col_a.button("🔁 Перегенерировать HTML"):
+        if st.button("💾 Сохранить и перегенерировать HTML"):
             try:
+                node["columns"] = updated_data
+
+                # --- принудительно сбрасываем YAML на диск ---
+                with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+                    yaml.dump(data_model, f, allow_unicode=True, sort_keys=False)
+                    f.flush()
+                    import os
+
+                    os.fsync(f.fileno())  # гарантируем запись на диск
+
+                # --- теперь запускаем генератор ---
                 generate_html()
-                st.success("HTML перегенерирован.")
+
+                st.success("✅ YAML сохранён, HTML перегенерирован.")
+                st.rerun()
+
             except Exception as e:
-                st.error(f"Ошибка при генерации: {e}")
-    else:
-        st.warning("Выберите узел для редактирования.")
+                st.error(f"Ошибка при сохранении или генерации: {e}")
+
