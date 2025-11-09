@@ -1,0 +1,4 @@
+streamlit
+pyvis
+pandas
+pyyaml

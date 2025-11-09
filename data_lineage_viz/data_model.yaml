@@ -1,0 +1,48 @@
+nodes:
+  - name: Catalog_input
+    layer: SharePoint
+    type: Excel
+    sheets:
+      - name: Main
+        columns:
+          - { name: LOT, link: "Merged_Spool_Data.LOT", comment: "ключ LOT" }
+          - { name: MFZ, link: "Merged_Spool_Data.MFZ", comment: "зона сборки" }
+          - { name: DN,  link: "", comment: "диаметр" }
+    comment: "Основной справочник материалов."
+
+  - name: Saved_progress
+    layer: SharePoint
+    type: Excel
+    sheets:
+      - name: Progress
+        columns:
+          - { name: LOT, link: "Merged_Spool_Data.LOT", comment: "ключ связи" }
+          - { name: Progress_Status, link: "Merged_Spool_Data.Progress_Status", comment: "merge по LOT" }
+    comment: "Статусы из SharePoint."
+
+  - name: Merged_Spool_Data
+    layer: PowerQuery
+    type: Table
+    sheets:
+      - name: Root
+        columns:
+          - { name: LOT, link: "Catalog_input.LOT", comment: "объединение по LOT" }
+          - { name: MFZ, link: "Catalog_input.MFZ", comment: "взято из Catalog_input" }
+          - { name: Progress_Status, link: "Saved_progress.Progress_Status", comment: "merge join" }
+    comment: "Основная таблица Power Query."
+
+  - name: Transfer_Orders
+    layer: Output
+    type: Report
+    sheets:
+      - name: Out
+        columns:
+          - { name: LOT, link: "Merged_Spool_Data.LOT", comment: "" }
+          - { name: Warehouse, link: "", comment: "" }
+          - { name: Date, link: "", comment: "" }
+    comment: "Финальный отчёт."
+
+edges:
+  - { from: Catalog_input, to: Merged_Spool_Data }
+  - { from: Saved_progress, to: Merged_Spool_Data }
+  - { from: Merged_Spool_Data, to: Transfer_Orders }
