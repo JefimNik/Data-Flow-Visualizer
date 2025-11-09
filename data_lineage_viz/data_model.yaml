@@ -42,12 +42,8 @@ nodes:
     comment: "Финальный отчёт."
 
 edges:
-  # обычная связь (автоматическая)
   - { from: Catalog_input, to: Merged_Spool_Data, type: normal }
-  - { from: Saved_progress, to: Merged_Spool_Data, type: normal }
-
-  # пунктирная (ручной перенос)
-  - { from: Merged_Spool_Data, to: Transfer_Orders, type: manual }
-
-  # полупрозрачная (связь планируется)
-  - { from: Saved_progress, to: Transfer_Orders, type: planned }
+  - { from: Saved_progress, to: Merged_Spool_Data, type: normal_bar }  # вкладка
+  - { from: Merged_Spool_Data, to: Transfer_Orders, type: manual }         # ручной перенос
+  - { from: Saved_progress, to: Transfer_Orders, type: planned }           # запланировано
+  - { from: Merged_Spool_Data, to: Saved_progress, type: normal_bar }      # комментарий

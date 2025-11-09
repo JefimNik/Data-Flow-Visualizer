@@ -11,7 +11,7 @@ def main():
     nodes_in = model.get("nodes", [])
     edges_in = model.get("edges", [])
 
-    # --- узлы
+    # --- данные узлов
     node_data = {}
     for n in nodes_in:
         cols = []
@@ -30,6 +30,7 @@ def main():
             "columns": cols
         }
 
+    # --- узлы
     vis_nodes = []
     for n in nodes_in:
         label = f"{n['name']}\n({n.get('layer','')})"
@@ -39,23 +40,26 @@ def main():
             "group": n.get("layer",""),
         })
 
-    # --- стили стрелок
+    # --- стили стрелок (5 типов)
     edge_styles = {
-        "normal":   {"color": "rgba(180,180,180,1)",   "dashes": False},
-        "manual":   {"color": "rgba(255,223,107,1)",   "dashes": True},
-        "planned":  {"color": "rgba(150,150,150,0.25)","dashes": False},  # теперь реально прозрачная
+        "normal":          {"color": "rgba(180,180,180,1)",   "dashes": False, "type": "arrow"},
+        "manual":          {"color": "rgba(255,223,107,1)",   "dashes": True,  "type": "arrow"},
+        "planned":         {"color": "rgba(150,150,150,0.25)","dashes": False, "type": "arrow"},
+        "normal_diamond":  {"color": "rgba(180,180,180,1)",   "dashes": False, "type": "diamond"},
+        "normal_bar":      {"color": "rgba(180,180,180,1)",   "dashes": False, "type": "bar"},
     }
 
     vis_edges = []
     for e in edges_in:
-        style = edge_styles.get(e.get("type", "normal"), edge_styles["normal"])
+        etype = e.get("type", "normal")
+        style = edge_styles.get(etype, edge_styles["normal"])
         vis_edges.append({
             "from": e["from"],
             "to": e["to"],
-            "arrows": "to",
+            "arrows": { "to": { "enabled": True, "type": style["type"], "scaleFactor": 0.7 } },
             "color": style["color"],
             "dashes": style["dashes"],
-            "type": e.get("type", "normal"),
+            "type": etype,
         })
 
     html = (
