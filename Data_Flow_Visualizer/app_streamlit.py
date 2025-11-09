@@ -28,14 +28,9 @@ def save_yaml(path, data):
 
 
 # --------- Генерация HTML ---------
-def generate_html(selected_node=None):
-    """Генерирует HTML и передаёт ID выделенного узла для подсветки."""
+def generate_html():
     try:
-        result = subprocess.run(
-            ["python", str(GENERATOR)],
-            capture_output=True,
-            text=True
-        )
+        result = subprocess.run(["python", str(GENERATOR)], capture_output=True, text=True)
         if result.returncode != 0:
             st.error("❌ Ошибка при генерации HTML:")
             st.code(result.stderr or result.stdout)
@@ -47,9 +42,7 @@ def generate_html(selected_node=None):
 
 # --------- Универсальная текстовая очистка ---------
 def textify(value):
-    """Принудительно превращает все значения и заголовки в строки, без изменения порядка."""
     if isinstance(value, dict):
-        # сохраняем порядок ключей
         return {str(k): textify(v) for k, v in value.items()}
     if isinstance(value, list):
         return [textify(v) for v in value]
@@ -58,157 +51,124 @@ def textify(value):
     return str(value)
 
 
-# --------- Создание Excel-шаблона узла ---------
-def make_excel(node: dict) -> BytesIO:
-    """Создаёт Excel-файл с данными узла и таблицей колонок, начиная с 7-й строки."""
+# --------- Создание Excel-шаблона для всей модели ---------
+def make_excel(data_model: dict) -> BytesIO:
     buffer = BytesIO()
     with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
-        sheet_name = "node"
-        pd.DataFrame().to_excel(writer, index=False, sheet_name=sheet_name)
-        ws = writer.sheets[sheet_name]
+        # ----- Лист 1: Узлы -----
+        nodes = data_model.get("nodes", [])
+        df_nodes = pd.DataFrame(
+            [
+                {
+                    "name": n.get("name", ""),
+                    "layer": n.get("layer", ""),
+                    "type": n.get("type", ""),
+                    "comment": n.get("comment", ""),
+                }
+                for n in nodes
+            ]
+        )
+        df_nodes.to_excel(writer, sheet_name="Nodes", index=False)
 
-        ws["A1"] = "Узел данных"
-        ws["A2"] = "name"; ws["B2"] = str(node.get("name", ""))
-        ws["A3"] = "layer"; ws["B3"] = str(node.get("layer", ""))
-        ws["A4"] = "type"; ws["B4"] = str(node.get("type", ""))
-        ws["A5"] = "comment"; ws["B5"] = str(node.get("comment", ""))
+        # ----- Лист 2: Колонки -----
+        records = []
+        for n in nodes:
+            for col in n.get("columns", []):
+                row = {"node_name": n.get("name", "")}
+                for k, v in col.items():
+                    row[k] = v
+                records.append(row)
+        df_cols = pd.DataFrame(records)
+        df_cols.to_excel(writer, sheet_name="Columns", index=False)
 
-        ws["A7"] = "Таблица колонок:"
-
-        # сохраняем порядок колонок как в YAML
-        cols = pd.DataFrame(textify(node.get("columns", [])))
-        cols = cols.fillna("").astype(str)
-        cols.columns = cols.columns.map(str)
-
-        headers = list(cols.columns) if not cols.empty else ["name", "type", "description", "comment"]
-        for i, h in enumerate(headers, start=1):
-            ws.cell(row=8, column=i, value=str(h))
-
-        for r, row in enumerate(cols.itertuples(index=False), start=9):
-            for c, value in enumerate(row, start=1):
-                ws.cell(row=r, column=c, value=str(value))
+        # ----- Лист 3: Связи -----
+        edges = data_model.get("edges", [])
+        df_edges = pd.DataFrame(edges)
+        df_edges.to_excel(writer, sheet_name="Edges", index=False)
 
     buffer.seek(0)
     return buffer
 
 
-# --------- Санитизация таблицы ---------
-def sanitize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.fillna("").astype(str)
-    df.columns = df.columns.map(str)
-    return df
+# --------- Сборка YAML из Excel ---------
+def rebuild_from_excel(uploaded_file) -> dict:
+    wb = openpyxl.load_workbook(uploaded_file)
+    data_model = {"nodes": [], "edges": []}
+
+    # --- Узлы ---
+    df_nodes = pd.DataFrame(wb["Nodes"].values)
+    df_nodes.columns = df_nodes.iloc[0]
+    df_nodes = df_nodes.drop(0).fillna("").astype(str)
+
+    # --- Колонки ---
+    if "Columns" in wb.sheetnames:
+        df_cols = pd.DataFrame(wb["Columns"].values)
+        df_cols.columns = df_cols.iloc[0]
+        df_cols = df_cols.drop(0).fillna("").astype(str)
+    else:
+        df_cols = pd.DataFrame(columns=["node_name", "name", "type", "description", "comment"])
+
+    # --- Связи ---
+    if "Edges" in wb.sheetnames:
+        df_edges = pd.DataFrame(wb["Edges"].values)
+        df_edges.columns = df_edges.iloc[0]
+        df_edges = df_edges.drop(0).fillna("").astype(str)
+    else:
+        df_edges = pd.DataFrame(columns=["from", "to", "transfer_type", "data_type", "transfer"])
+
+    # --- Формируем узлы с колонками ---
+    for _, n in df_nodes.iterrows():
+        node_name = n["name"]
+        cols_df = df_cols[df_cols["node_name"] == node_name].drop(columns=["node_name"], errors="ignore")
+        node_dict = {
+            "name": node_name,
+            "layer": n.get("layer", ""),
+            "type": n.get("type", ""),
+            "comment": n.get("comment", ""),
+            "columns": textify(cols_df.to_dict(orient="records")),
+        }
+        data_model["nodes"].append(node_dict)
+
+    # --- Связи ---
+    for _, e in df_edges.iterrows():
+        e_dict = {str(k): str(v) for k, v in e.items()}
+        data_model["edges"].append(e_dict)
+
+    return data_model
 
 
 # --------- Интерфейс Streamlit ---------
 st.set_page_config(page_title="Data Flow Visualizer Editor", layout="wide")
-st.title("🧩 Data Flow Visualizer — YAML + Excel Editor")
-
-# ---------- ВЕРХНИЙ БЛОК ----------
-st.subheader("⚙️ Экспорт и обновление узлов через Excel")
+st.title("🧩 Data Flow Visualizer — Полная модель данных")
 
 if not CONFIG_PATH.exists():
     st.error(f"❌ Файл YAML не найден: {CONFIG_PATH}")
     st.stop()
 
 data_model = load_yaml(CONFIG_PATH)
-if not data_model or "nodes" not in data_model:
-    st.error("❌ Некорректный YAML (нет ключа 'nodes').")
-    st.stop()
 
-node_names = [n.get("name", "без имени") for n in data_model.get("nodes", [])]
-selected_node_name = st.selectbox("Выберите узел для экспорта", node_names)
-node = next((n for n in data_model["nodes"] if n.get("name") == selected_node_name), None)
+# ---------- ВЕРХНИЙ БЛОК ----------
+st.subheader("📥 Экспорт и импорт всей модели")
 
-if node:
-    st.markdown(f"#### 🧱 Узел: `{node['name']}`")
+col1, col2 = st.columns(2)
 
-    # 📥 Скачать Excel-шаблон
+with col1:
     st.download_button(
-        label="📥 Скачать Excel шаблон с данными узла (всё на одном листе)",
-        data=make_excel(node),
-        file_name=f"{selected_node_name}_template.xlsx",
+        label="📤 Скачать всю модель в Excel",
+        data=make_excel(data_model),
+        file_name="data_model.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
 
-    # 📤 Загрузить изменённый Excel
-    st.markdown("##### 📤 Загрузите изменённый Excel-файл узла")
-    uploaded = st.file_uploader("Выберите Excel-файл", type=["xlsx"], key="upload_excel")
+with col2:
+    uploaded = st.file_uploader("📥 Загрузить обновлённый Excel", type=["xlsx"])
 
     if uploaded is not None:
         try:
-            wb = openpyxl.load_workbook(uploaded)
-            ws = wb.active
-
-            # Читаем базовые параметры
-            name = ws["B2"].value or ""
-            layer = ws["B3"].value or ""
-            type_ = ws["B4"].value or ""
-            comment = ws["B5"].value or ""
-
-            # --- Читаем таблицу колонок с гибким числом столбцов ---
-            start_row = 9
-            headers = []
-            col = 1
-            while True:
-                val = ws.cell(row=8, column=col).value
-                if val is None or str(val).strip() == "":
-                    break
-                headers.append(str(val).strip())
-                col += 1
-
-            if not headers:
-                headers = ["name", "type", "description", "comment"]
-
-            # Читаем строки данных
-            data_rows = []
-            for r in range(start_row, ws.max_row + 1):
-                row_data = {h: ws.cell(row=r, column=i + 1).value for i, h in enumerate(headers)}
-                if any(v is not None and str(v).strip() != "" for v in row_data.values()):
-                    data_rows.append(row_data)
-
-            # Принудительно текстовые значения, сохраняем порядок
-            cols_df = pd.DataFrame(data_rows, columns=headers)
-            cols_df = cols_df.fillna("").astype(str)
-
-            # Обновляем YAML
-            new_name = str(name).strip() or selected_node_name
-            updated_node = {
-                "name": new_name,
-                "layer": str(layer).strip(),
-                "type": str(type_).strip(),
-                "comment": str(comment).strip(),
-                "columns": textify(cols_df.to_dict(orient="records")),
-            }
-
-            # Проверяем уникальность
-            existing_names = [n["name"] for n in data_model["nodes"]]
-            if new_name != selected_node_name and new_name in existing_names:
-                st.error(f"❌ Узел с именем '{new_name}' уже существует.")
-                st.stop()
-
-            # Заменяем старый узел
-            replaced = False
-            for i, n in enumerate(data_model["nodes"]):
-                if n.get("name") == selected_node_name:
-                    data_model["nodes"][i] = updated_node
-                    replaced = True
-                    break
-            if not replaced:
-                data_model["nodes"].append(updated_node)
-
-            # 💾 Сохраняем YAML и перегенерируем HTML
-            save_yaml(CONFIG_PATH, data_model)
-            generate_html(selected_node_name)
-
-            st.success(f"✅ YAML обновлён. Узел '{selected_node_name}' → '{new_name}'. HTML перегенерирован.")
-            st.dataframe(cols_df)
-
-            # Обновляем страницу с подсветкой выбранного узла
-            st.markdown(
-                f"<script>window.location.reload(); sessionStorage.setItem('highlightNode', '{new_name}');</script>",
-                unsafe_allow_html=True,
-            )
-
+            new_model = rebuild_from_excel(uploaded)
+            save_yaml(CONFIG_PATH, new_model)
+            generate_html()
+            st.success("✅ YAML обновлён и HTML перегенерирован.")
         except Exception as e:
             st.error(f"Ошибка при обработке Excel: {e}")
 
@@ -219,17 +179,8 @@ st.subheader("🔗 Визуализация модели данных")
 try:
     if BUILD_HTML.exists():
         html_code = BUILD_HTML.read_text(encoding="utf-8")
-        js_script = """
-        <script>
-        const lastNode = sessionStorage.getItem('highlightNode');
-        if (lastNode && typeof highlightNode === 'function') {
-            setTimeout(() => highlightNode(lastNode), 1000);
-            sessionStorage.removeItem('highlightNode');
-        }
-        </script>
-        """
-        st.components.v1.html(html_code + js_script, height=850, scrolling=True)
+        st.components.v1.html(html_code, height=850, scrolling=True)
     else:
-        st.warning("⚠️ HTML не найден. Сначала сгенерируйте его через Excel.")
+        st.warning("⚠️ HTML не найден. Сначала экспортируйте и обновите YAML.")
 except Exception as e:
     st.error(f"Ошибка отображения HTML: {e}")
