@@ -22,7 +22,7 @@ nodes:
 edges:
   - from: Catalog_input
     to: Merged_Spool_Data
-    transfer_type: pq
+    transfer_type: planned
     data_type: general
     transfer:
       - [LOT, "LOT → Merged_Spool_Data.LOT"]

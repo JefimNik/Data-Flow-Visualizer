@@ -35,17 +35,28 @@ def main():
         for n in nodes_in
     ]
 
+    # --- стили стрелок по типу передачи ---
+    style_map = {
+        "pq":       {"color": "rgba(180,180,180,1)",   "dashes": False},
+        "manual":   {"color": "rgba(255,223,107,1)",   "dashes": True},
+        "planned":  {"color": "rgba(150,150,150,0.25)","dashes": False},
+        "default":  {"color": "rgba(200,200,200,1)",   "dashes": False},
+    }
+
     vis_edges = []
     for i, e in enumerate(edges_in):
+        transfer_type = e.get("transfer_type", "default")
+        style = style_map.get(transfer_type, style_map["default"])
         vis_edges.append({
             "id": f"edge_{i}_{e['from']}_{e['to']}",
             "from": e["from"],
             "to": e["to"],
             "transfer": e.get("transfer", []),
-            "transfer_type": e.get("transfer_type", "pq"),
+            "transfer_type": transfer_type,
             "data_type": e.get("data_type", "general"),
-            "color": "rgba(200,200,200,1)",
-            "arrows": {"to": {"enabled": True, "type": "arrow"}},
+            "color": style["color"],
+            "dashes": style["dashes"],
+            "arrows": {"to": {"enabled": True, "type": "arrow", "scaleFactor": 0.8}},
             "length": 250
         })
 

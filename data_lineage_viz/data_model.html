@@ -5,13 +5,39 @@
 <title>Data Flow Visualizer</title>
 <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 <style>
-  body { margin:0; display:flex; height:100vh; background:#111; color:#eee; font-family:"Segoe UI",sans-serif; }
-  #mynetwork { flex:2; background:#1b1b1b; }
-  #details { flex:1; background:#141414; padding:12px; overflow-y:auto; border-left:2px solid #222; }
-  #filter { padding:10px; border-bottom:1px solid #333; background:#1d1d1d; }
-  table { border-collapse:collapse; width:100%; font-size:13px; margin-top:8px; }
-  th,td { border:1px solid #333; padding:4px 6px; }
-  th { background:#222; color:#ffdf6b; }
+  body {
+    margin: 0;
+    display: flex;
+    height: 100vh;
+    background: #111;
+    color: #eee;
+    font-family: "Segoe UI", sans-serif;
+  }
+  #mynetwork {
+    flex: 2;
+    background: #1b1b1b;
+  }
+  #details {
+    flex: 1;
+    background: #141414;
+    padding: 12px;
+    overflow-y: auto;
+    border-left: 2px solid #222;
+  }
+  #filter {
+    padding: 10px;
+    border-bottom: 1px solid #333;
+    background: #1d1d1d;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 13px;
+    margin-top: 8px;
+  }
+  th,td { border: 1px solid #333; padding: 4px 6px; }
+  th { background: #222; color: #ffdf6b; }
+  tr:hover td { background: #2b2b2b; }
 </style>
 </head>
 <body>
@@ -28,7 +54,7 @@
 
   <script id="NODE_DATA" type="application/json">{"Catalog_input": {"layer": "SharePoint", "type": "Excel", "comment": "Основной справочник материалов.", "columns": []}, "Saved_progress": {"layer": "SharePoint", "type": "Excel", "comment": "Статусы из SharePoint.", "columns": []}, "Merged_Spool_Data": {"layer": "PowerQuery", "type": "Table", "comment": "Таблица Power Query.", "columns": []}, "Transfer_Orders": {"layer": "Output", "type": "Report", "comment": "Финальный отчёт.", "columns": []}}</script>
   <script id="VIS_NODES" type="application/json">[{"id": "Catalog_input", "label": "Catalog_input\n(SharePoint)", "group": "SharePoint"}, {"id": "Saved_progress", "label": "Saved_progress\n(SharePoint)", "group": "SharePoint"}, {"id": "Merged_Spool_Data", "label": "Merged_Spool_Data\n(PowerQuery)", "group": "PowerQuery"}, {"id": "Transfer_Orders", "label": "Transfer_Orders\n(Output)", "group": "Output"}]</script>
-  <script id="VIS_EDGES" type="application/json">[{"id": "edge_0_Catalog_input_Merged_Spool_Data", "from": "Catalog_input", "to": "Merged_Spool_Data", "transfer": [["LOT", "LOT → Merged_Spool_Data.LOT"], ["MFZ", "MFZ → Merged_Spool_Data.MFZ"]], "transfer_type": "pq", "data_type": "general", "color": "rgba(200,200,200,1)", "arrows": {"to": {"enabled": true, "type": "arrow"}}, "length": 250}, {"id": "edge_1_Saved_progress_Merged_Spool_Data", "from": "Saved_progress", "to": "Merged_Spool_Data", "transfer": [["Progress_Status", "Progress_Status → Merged_Spool_Data.Progress_Status"]], "transfer_type": "pq", "data_type": "progress", "color": "rgba(200,200,200,1)", "arrows": {"to": {"enabled": true, "type": "arrow"}}, "length": 250}, {"id": "edge_2_Merged_Spool_Data_Transfer_Orders", "from": "Merged_Spool_Data", "to": "Transfer_Orders", "transfer": [["LOT", "LOT → Transfer_Orders.LOT"], ["Warehouse", "формируется вручную"]], "transfer_type": "manual", "data_type": "cost", "color": "rgba(200,200,200,1)", "arrows": {"to": {"enabled": true, "type": "arrow"}}, "length": 250}]</script>
+  <script id="VIS_EDGES" type="application/json">[{"id": "edge_0_Catalog_input_Merged_Spool_Data", "from": "Catalog_input", "to": "Merged_Spool_Data", "transfer": [["LOT", "LOT → Merged_Spool_Data.LOT"], ["MFZ", "MFZ → Merged_Spool_Data.MFZ"]], "transfer_type": "planned", "data_type": "general", "color": "rgba(150,150,150,0.25)", "dashes": false, "arrows": {"to": {"enabled": true, "type": "arrow", "scaleFactor": 0.8}}, "length": 250}, {"id": "edge_1_Saved_progress_Merged_Spool_Data", "from": "Saved_progress", "to": "Merged_Spool_Data", "transfer": [["Progress_Status", "Progress_Status → Merged_Spool_Data.Progress_Status"]], "transfer_type": "pq", "data_type": "progress", "color": "rgba(180,180,180,1)", "dashes": false, "arrows": {"to": {"enabled": true, "type": "arrow", "scaleFactor": 0.8}}, "length": 250}, {"id": "edge_2_Merged_Spool_Data_Transfer_Orders", "from": "Merged_Spool_Data", "to": "Transfer_Orders", "transfer": [["LOT", "LOT → Transfer_Orders.LOT"], ["Warehouse", "формируется вручную"]], "transfer_type": "manual", "data_type": "cost", "color": "rgba(255,223,107,1)", "dashes": true, "arrows": {"to": {"enabled": true, "type": "arrow", "scaleFactor": 0.8}}, "length": 250}]</script>
 
 <script>
   const nodeData = JSON.parse(document.getElementById("NODE_DATA").textContent);
@@ -41,8 +67,8 @@
   const container = document.getElementById("mynetwork");
   const network = new vis.Network(container, { nodes, edges }, {
     physics: { enabled: true, barnesHut: { gravitationalConstant: -3000 } },
-    nodes: { shape: "box", font: { color: "#fff" } },
-    edges: { smooth: { type: "cubicBezier" }, width: 1.3, color: "#999" }
+    nodes: { shape: "box", font: { color: "#888", size: 14, bold: false } },
+    edges: { smooth: { type: "cubicBezier" }, width: 1.3 }
   });
 
   const info = document.getElementById("info");
@@ -54,6 +80,11 @@
       const n = nodeData[id];
       if (!n) return;
       let html = `<h3>${id}</h3><p><b>Тип:</b> ${n.type} | <b>Слой:</b> ${n.layer}</p><p>${n.comment}</p>`;
+      if (n.columns && n.columns.length) {
+        html += `<table><tr><th>Sheet</th><th>Column</th><th>Link</th><th>Comment</th></tr>`;
+        n.columns.forEach(c => html += `<tr><td>${c.Sheet}</td><td>${c.Column}</td><td>${c.Link}</td><td>${c.Comment}</td></tr>`);
+        html += `</table>`;
+      }
       info.innerHTML = html;
     } else if (params.edges.length > 0) {
       const e = edges.get(params.edges[0]);
