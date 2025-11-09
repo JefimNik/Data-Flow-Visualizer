@@ -1,0 +1,28 @@
+visual:
+  background: "#1b1b1b"
+  node_font: "#0e0e0e"
+  node_font_size: 14
+  node_border: "#333"
+  edge_width: 1.4
+physics:
+  enabled: true
+  gravitationalConstant: -3000
+  springLength: 200
+  springConstant: 0.04
+colors:
+  data_type:
+    workers: "#66c2a5"
+    progress: "#fc8d62"
+    hours: "#8da0cb"
+    cost: "#e78ac3"
+    materials: "#a6d854"
+    documents: "#ffd92f"
+  transfer_type:
+    pq: {dashes: false, opacity: 1.0}
+    manual: {dashes: true, opacity: 1.0}
+    planned: {dashes: false, opacity: 0.3}
+variables:
+  zoom_enabled: true
+  drag_nodes: true
+  highlight_on_hover: true
+  animation_speed: 0.3

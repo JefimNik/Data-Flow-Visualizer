@@ -1,0 +1,70 @@
+version: 1.0
+author: Jefim
+description: "Пример модели данных"
+nodes:
+  - name: Catalog_input
+    layer: SharePoint
+    type: Excel
+    comment: "Основной справочник материалов"
+  - name: Saved_progress
+    layer: SharePoint
+    type: Excel
+    comment: "Статусы выполнения"
+  - name: Work_Hours
+    layer: SharePoint
+    type: Excel
+    comment: "Учёт рабочих часов"
+  - name: Merged_Spool_Data
+    layer: PowerQuery
+    type: Table
+    comment: "Объединённая таблица данных"
+  - name: Transfer_Orders
+    layer: Output
+    type: Report
+    comment: "Финальный отчёт"
+
+edges:
+  - from: Catalog_input
+    to: Merged_Spool_Data
+    transfer_type: pq
+    data_type: materials
+    transfer:
+      - [LOT, "LOT → Merged_Spool_Data.LOT"]
+      - [MFZ, "MFZ → Merged_Spool_Data.MFZ"]
+
+  - from: Saved_progress
+    to: Merged_Spool_Data
+    transfer_type: pq
+    data_type: progress
+    transfer:
+      - [Progress_Status, "Progress_Status → Merged_Spool_Data.Progress_Status"]
+
+  - from: Work_Hours
+    to: Merged_Spool_Data
+    transfer_type: pq
+    data_type: hours
+    transfer:
+      - [Worker_ID, "Worker_ID → Merged_Spool_Data.Worker_ID"]
+      - [Hours, "Hours → Merged_Spool_Data.Hours"]
+
+  - from: Merged_Spool_Data
+    to: Transfer_Orders
+    transfer_type: manual
+    data_type: cost
+    transfer:
+      - [LOT, "LOT → Transfer_Orders.LOT"]
+      - [Warehouse, "Warehouse → Transfer_Orders.Warehouse"]
+
+  - from: Saved_progress
+    to: Transfer_Orders
+    transfer_type: planned
+    data_type: documents
+    transfer:
+      - [Report_ID, "Report_ID → Transfer_Orders.Report_ID"]
+
+  - from: Work_Hours
+    to: Transfer_Orders
+    transfer_type: pq
+    data_type: workers
+    transfer:
+      - [Worker_ID, "Worker_ID → Transfer_Orders.Worker_ID"]

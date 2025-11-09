@@ -1,0 +1,4 @@
+# 📦 Changelog
+
+## v1.0
+- Initial working version

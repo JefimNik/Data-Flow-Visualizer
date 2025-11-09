@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Data Flow Visualizer</title>
+<script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+<style>
+  body {margin:0;display:flex;height:100vh;background:#111;color:#eee;font-family:"Segoe UI",sans-serif;}
+  #mynetwork {flex:2;background:#1b1b1b;}
+  #details {flex:1;background:#141414;padding:12px;overflow-y:auto;border-left:2px solid #222;}
+  #filter {padding:10px;border-bottom:1px solid #333;background:#1d1d1d;}
+  table {border-collapse:collapse;width:100%;font-size:13px;margin-top:8px;}
+  th,td {border:1px solid #333;padding:4px 6px;}
+  th {background:#222;color:#ffdf6b;}
+</style>
+</head>
+<body>
+<div id="mynetwork"></div>
+<div id="details">
+  <div id="filter">
+    <b>Фильтр по типу данных:</b><br>
+    <label><input type="checkbox" class="dtype" value="workers" checked> workers</label><br>
+    <label><input type="checkbox" class="dtype" value="progress" checked> progress</label><br>
+    <label><input type="checkbox" class="dtype" value="hours" checked> hours</label><br>
+    <label><input type="checkbox" class="dtype" value="cost" checked> cost</label><br>
+    <label><input type="checkbox" class="dtype" value="materials" checked> materials</label><br>
+    <label><input type="checkbox" class="dtype" value="documents" checked> documents</label><br>
+  </div>
+  <div id="info"><p>Нажмите на узел или стрелку</p></div>
+</div>
+<script id="VIS_NODES" type="application/json">[{"id": "Catalog_input", "label": "Catalog_input\n(SharePoint)", "group": "SharePoint"}, {"id": "Saved_progress", "label": "Saved_progress\n(SharePoint)", "group": "SharePoint"}, {"id": "Work_Hours", "label": "Work_Hours\n(SharePoint)", "group": "SharePoint"}, {"id": "Merged_Spool_Data", "label": "Merged_Spool_Data\n(PowerQuery)", "group": "PowerQuery"}, {"id": "Transfer_Orders", "label": "Transfer_Orders\n(Output)", "group": "Output"}]</script>
+<script id="VIS_EDGES" type="application/json">[{"id": "edge_0_Catalog_input_Merged_Spool_Data", "from": "Catalog_input", "to": "Merged_Spool_Data", "transfer": [["LOT", "LOT → Merged_Spool_Data.LOT"], ["MFZ", "MFZ → Merged_Spool_Data.MFZ"]], "transfer_type": "pq", "data_type": "materials", "color": "rgba(166, 216, 84, 1.0)", "dashes": false, "arrows": {"to": {"enabled": true, "type": "arrow", "scaleFactor": 0.8}}, "length": 250}, {"id": "edge_1_Saved_progress_Merged_Spool_Data", "from": "Saved_progress", "to": "Merged_Spool_Data", "transfer": [["Progress_Status", "Progress_Status → Merged_Spool_Data.Progress_Status"]], "transfer_type": "pq", "data_type": "progress", "color": "rgba(252, 141, 98, 1.0)", "dashes": false, "arrows": {"to": {"enabled": true, "type": "arrow", "scaleFactor": 0.8}}, "length": 250}, {"id": "edge_2_Work_Hours_Merged_Spool_Data", "from": "Work_Hours", "to": "Merged_Spool_Data", "transfer": [["Worker_ID", "Worker_ID → Merged_Spool_Data.Worker_ID"], ["Hours", "Hours → Merged_Spool_Data.Hours"]], "transfer_type": "pq", "data_type": "hours", "color": "rgba(141, 160, 203, 1.0)", "dashes": false, "arrows": {"to": {"enabled": true, "type": "arrow", "scaleFactor": 0.8}}, "length": 250}, {"id": "edge_3_Merged_Spool_Data_Transfer_Orders", "from": "Merged_Spool_Data", "to": "Transfer_Orders", "transfer": [["LOT", "LOT → Transfer_Orders.LOT"], ["Warehouse", "Warehouse → Transfer_Orders.Warehouse"]], "transfer_type": "manual", "data_type": "cost", "color": "rgba(231, 138, 195, 1.0)", "dashes": true, "arrows": {"to": {"enabled": true, "type": "arrow", "scaleFactor": 0.8}}, "length": 250}, {"id": "edge_4_Saved_progress_Transfer_Orders", "from": "Saved_progress", "to": "Transfer_Orders", "transfer": [["Report_ID", "Report_ID → Transfer_Orders.Report_ID"]], "transfer_type": "planned", "data_type": "documents", "color": "rgba(255, 217, 47, 0.3)", "dashes": false, "arrows": {"to": {"enabled": true, "type": "arrow", "scaleFactor": 0.8}}, "length": 250}, {"id": "edge_5_Work_Hours_Transfer_Orders", "from": "Work_Hours", "to": "Transfer_Orders", "transfer": [["Worker_ID", "Worker_ID → Transfer_Orders.Worker_ID"]], "transfer_type": "pq", "data_type": "workers", "color": "rgba(102, 194, 165, 1.0)", "dashes": false, "arrows": {"to": {"enabled": true, "type": "arrow", "scaleFactor": 0.8}}, "length": 250}]</script>
+<script>
+const nodesRaw = JSON.parse(document.getElementById("VIS_NODES").textContent);
+const edgesRaw = JSON.parse(document.getElementById("VIS_EDGES").textContent);
+const nodes = new vis.DataSet(nodesRaw);
+const edges = new vis.DataSet(edgesRaw);
+const container = document.getElementById("mynetwork");
+const network = new vis.Network(container,{nodes,edges},{
+  physics:{enabled:true,barnesHut:{gravitationalConstant:-3000}},
+  nodes:{shape:"box",font:{color:"#0e0e0e",size:14},borderWidth:1,margin:10,color:{background:"#1b1b1b",border:"#333"}},
+  edges:{smooth:{type:"cubicBezier"},width:1.4}
+});
+const info=document.getElementById("info");
+network.on("click",p=>{
+ if(p.nodes.length>0){
+  const id=p.nodes[0];
+  info.innerHTML=`<h3>${id}</h3>`;
+ } else if(p.edges.length>0){
+  const e=edges.get(p.edges[0]);
+  let html=`<h3>${e.from} → ${e.to}</h3><p><b>Тип передачи:</b> ${e.transfer_type}</p><p><b>Тип данных:</b> ${e.data_type}</p>`;
+  if(e.transfer&&e.transfer.length){html+=`<table><tr><th>Поле</th><th>Описание</th></tr>`;e.transfer.forEach(t=>html+=`<tr><td>${t[0]}</td><td>${t[1]}</td></tr>`);html+=`</table>`;}
+  info.innerHTML=html;
+ }
+});
+document.querySelectorAll('.dtype').forEach(chk=>{
+ chk.addEventListener('change',()=>{
+  const active=Array.from(document.querySelectorAll('.dtype:checked')).map(c=>c.value);
+  edgesRaw.forEach(e=>edges.update({id:e.id,hidden:!active.includes(e.data_type)}));
+ });
+});
+</script>
+</body>
+</html>
