@@ -4,36 +4,39 @@ import pandas as pd
 import yaml
 import pathlib
 import subprocess
+import tempfile
 
-# -------- Настройки --------
+# --------- Настройки страницы ---------
 st.set_page_config(page_title="Data Flow Visualizer Editor", layout="wide")
 
 CONFIG_PATH = pathlib.Path("config/data_model.yaml")
 GENERATOR = pathlib.Path("src/generate_html.py")
 BUILD_HTML = pathlib.Path("build/data_model_v1.html")
 
-# -------- Функции --------
-def load_yaml(path: pathlib.Path):
+# --------- Загрузка YAML ---------
+@st.cache_data
+def load_yaml(path):
     with open(path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
-def save_yaml(path: pathlib.Path, data: dict):
+def save_yaml(path, data):
     with open(path, "w", encoding="utf-8") as f:
         yaml.dump(data, f, allow_unicode=True, sort_keys=False)
 
+# --------- Функция генерации HTML ---------
 def generate_html():
     subprocess.run(["python", str(GENERATOR)], check=True)
 
-# -------- Интерфейс --------
+# --------- UI ---------
 st.title("🧩 Data Flow Visualizer — YAML Editor")
 
 col1, col2 = st.columns([2, 1])
 
-# ---------- Левая колонка: визуализация ----------
+# ---------- Левая колонка: граф ----------
 with col1:
     st.subheader("🔗 Визуализация модели данных")
     try:
-        generate_html()  # всегда генерируем актуальный HTML
+        generate_html()  # генерируем актуальную версию HTML
         html_code = BUILD_HTML.read_text(encoding="utf-8")
         st.components.v1.html(html_code, height=850, scrolling=True)
     except Exception as e:
@@ -46,6 +49,7 @@ with col2:
     data_model = load_yaml(CONFIG_PATH)
     node_names = [n["name"] for n in data_model.get("nodes", [])]
 
+    # выбор узла
     selected_node_name = st.selectbox("Выберите узел для редактирования", node_names)
     node = next((n for n in data_model["nodes"] if n["name"] == selected_node_name), None)
 
@@ -56,7 +60,9 @@ with col2:
         node["type"] = col_b.text_input("Тип", value=node.get("type", ""))
         node["comment"] = st.text_area("Комментарий", value=node.get("comment", ""), height=80)
 
+        # таблица колонок
         st.markdown("##### 📋 Колонки таблицы")
+
         columns_df = pd.DataFrame(node.get("columns", []))
         if columns_df.empty:
             columns_df = pd.DataFrame(columns=["name", "type", "description", "comment"])
@@ -70,7 +76,7 @@ with col2:
         grid_response = AgGrid(
             columns_df,
             gridOptions=grid_options,
-            update_on="model_changed",  # ✅ новый параметр вместо update_mode
+            update_mode=GridUpdateMode.MODEL_CHANGED,
             height=400,
             fit_columns_on_grid_load=True,
             allow_unsafe_jscode=True,
@@ -80,18 +86,21 @@ with col2:
 
         updated_data = grid_response["data"].to_dict(orient="records")
 
-        # ---- Одна кнопка: сохранить + сгенерировать + обновить ----
-        if st.button("💾 Сохранить и обновить визуализацию"):
+        # кнопки
+        st.markdown("---")
+        col_s, col_a = st.columns([1, 1])
+        if col_s.button("💾 Сохранить изменения"):
+            node["columns"] = updated_data
+            save_yaml(CONFIG_PATH, data_model)
+            st.success("✅ Изменения сохранены")
+            data_model = load_yaml(CONFIG_PATH)
+            node = next((n for n in data_model["nodes"] if n["name"] == selected_node_name), None)
+
+        if col_a.button("🔁 Перегенерировать HTML"):
             try:
-                node["columns"] = updated_data
-                save_yaml(CONFIG_PATH, data_model)
                 generate_html()
-                st.success("✅ Изменения сохранены и визуализация обновлена.")
-                # перечитать YAML чтобы обновить форму
-                data_model = load_yaml(CONFIG_PATH)
-                node = next((n for n in data_model["nodes"] if n["name"] == selected_node_name), None)
-                st.rerun()()
+                st.success("HTML перегенерирован.")
             except Exception as e:
-                st.error(f"Ошибка при сохранении или генерации: {e}")
+                st.error(f"Ошибка при генерации: {e}")
     else:
         st.warning("Выберите узел для редактирования.")

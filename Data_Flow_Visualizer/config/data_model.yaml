@@ -16,7 +16,7 @@ nodes:
     description: Код монтажной зоны
     comment: Используется для группировки деталей
   - name: Material
-    type: Number7
+    type: Number8
     description: Тип материала
     comment: Поле из ERP каталога
   - name: Supplier
