@@ -11,7 +11,7 @@ def main():
     nodes_in = model.get("nodes", [])
     edges_in = model.get("edges", [])
 
-    # --- данные узлов
+    # --- узлы ---
     node_data = {}
     for n in nodes_in:
         cols = []
@@ -30,7 +30,7 @@ def main():
             "columns": cols
         }
 
-    # --- узлы
+    # --- узлы для визуализации ---
     vis_nodes = []
     for n in nodes_in:
         label = f"{n['name']}\n({n.get('layer','')})"
@@ -40,7 +40,7 @@ def main():
             "group": n.get("layer",""),
         })
 
-    # --- стили стрелок (5 типов)
+    # --- типы стрелок ---
     edge_styles = {
         "normal":          {"color": "rgba(180,180,180,1)",   "dashes": False, "type": "arrow"},
         "manual":          {"color": "rgba(255,223,107,1)",   "dashes": True,  "type": "arrow"},
@@ -60,6 +60,7 @@ def main():
             "color": style["color"],
             "dashes": style["dashes"],
             "type": etype,
+            "transfer": e.get("transfer", [])
         })
 
     html = (

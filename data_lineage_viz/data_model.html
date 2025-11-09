@@ -6,11 +6,13 @@
 <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 <style>
   body {
-    margin: 0; padding: 0;
-    display: flex; height: 100vh; overflow: hidden;
-    background: radial-gradient(circle at 40% 40%, #1a1a1a 0%, #0d0d0d 70%);
+    margin: 0;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    background: #111;
     color: #f5f5f5;
-    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: "Segoe UI", sans-serif;
   }
   #mynetwork {
     flex: 2;
@@ -25,100 +27,82 @@
     overflow-y: auto;
     transition: all 0.3s ease;
   }
-  #details.hidden { transform: translateX(100%); opacity: 0; }
   h3 { margin-top: 0; color: #58a6ff; }
-  h4 { margin-bottom: 6px; color: #7fdfff; }
   table {
-    border-collapse: collapse; width: 100%; margin-top: 10px;
-    font-size: 13px; background: #1e1e1e;
+    border-collapse: collapse; width: 100%; margin-top: 10px; font-size: 13px; background: #1e1e1e;
   }
-  th, td {
-    border: 1px solid #333; padding: 6px 8px; text-align: left; color: #ddd;
-  }
-  th {
-    background: #222; color: #ffdf6b; position: sticky; top: 0; z-index: 1;
-  }
+  th, td { border: 1px solid #333; padding: 6px 8px; text-align: left; color: #ddd; }
+  th { background: #222; color: #ffdf6b; position: sticky; top: 0; }
   tr:hover td { background: #2b2b2b; }
-  .comment { color: #bbb; font-style: italic; }
+  .comment { color: #aaa; font-style: italic; }
 </style>
 </head>
 <body>
   <div id="mynetwork"></div>
-  <div id="details" class="hidden">
-    <h3>📋 Table details</h3>
-    <div id="table-info"><p style="color:#888">Click a node to see details.</p></div>
+  <div id="details">
+    <h3>📋 Детали</h3>
+    <div id="table-info"><p style="color:#888">Нажмите на узел или стрелку</p></div>
   </div>
 
   <script id="NODE_DATA" type="application/json">{"Catalog_input": {"layer": "SharePoint", "type": "Excel", "comment": "Основной справочник материалов.", "columns": [{"Sheet": "Main", "Column": "LOT", "Link": "Merged_Spool_Data.LOT", "Comment": "ключ LOT"}, {"Sheet": "Main", "Column": "MFZ", "Link": "Merged_Spool_Data.MFZ", "Comment": "зона сборки"}]}, "Saved_progress": {"layer": "SharePoint", "type": "Excel", "comment": "Статусы из SharePoint.", "columns": [{"Sheet": "Progress", "Column": "LOT", "Link": "Merged_Spool_Data.LOT", "Comment": "ключ связи"}, {"Sheet": "Progress", "Column": "Progress_Status", "Link": "Merged_Spool_Data.Progress_Status", "Comment": "merge по LOT"}]}, "Merged_Spool_Data": {"layer": "PowerQuery", "type": "Table", "comment": "Основная таблица Power Query.", "columns": [{"Sheet": "Root", "Column": "LOT", "Link": "Catalog_input.LOT", "Comment": "объединение по LOT"}, {"Sheet": "Root", "Column": "MFZ", "Link": "Catalog_input.MFZ", "Comment": "взято из Catalog_input"}, {"Sheet": "Root", "Column": "Progress_Status", "Link": "Saved_progress.Progress_Status", "Comment": "merge join"}]}, "Transfer_Orders": {"layer": "Output", "type": "Report", "comment": "Финальный отчёт.", "columns": [{"Sheet": "Out", "Column": "LOT", "Link": "Merged_Spool_Data.LOT", "Comment": ""}, {"Sheet": "Out", "Column": "Warehouse", "Link": "", "Comment": ""}, {"Sheet": "Out", "Column": "Date", "Link": "", "Comment": ""}]}}</script>
   <script id="VIS_NODES" type="application/json">[{"id": "Catalog_input", "label": "Catalog_input\n(SharePoint)", "group": "SharePoint"}, {"id": "Saved_progress", "label": "Saved_progress\n(SharePoint)", "group": "SharePoint"}, {"id": "Merged_Spool_Data", "label": "Merged_Spool_Data\n(PowerQuery)", "group": "PowerQuery"}, {"id": "Transfer_Orders", "label": "Transfer_Orders\n(Output)", "group": "Output"}]</script>
-  <script id="VIS_EDGES" type="application/json">[{"from": "Catalog_input", "to": "Merged_Spool_Data", "arrows": {"to": {"enabled": true, "type": "arrow", "scaleFactor": 0.7}}, "color": "rgba(180,180,180,1)", "dashes": false, "type": "normal"}, {"from": "Saved_progress", "to": "Merged_Spool_Data", "arrows": {"to": {"enabled": true, "type": "bar", "scaleFactor": 0.7}}, "color": "rgba(180,180,180,1)", "dashes": false, "type": "normal_bar"}, {"from": "Merged_Spool_Data", "to": "Transfer_Orders", "arrows": {"to": {"enabled": true, "type": "arrow", "scaleFactor": 0.7}}, "color": "rgba(255,223,107,1)", "dashes": true, "type": "manual"}, {"from": "Saved_progress", "to": "Transfer_Orders", "arrows": {"to": {"enabled": true, "type": "arrow", "scaleFactor": 0.7}}, "color": "rgba(150,150,150,0.25)", "dashes": false, "type": "planned"}, {"from": "Merged_Spool_Data", "to": "Saved_progress", "arrows": {"to": {"enabled": true, "type": "bar", "scaleFactor": 0.7}}, "color": "rgba(180,180,180,1)", "dashes": false, "type": "normal_bar"}]</script>
+  <script id="VIS_EDGES" type="application/json">[{"from": "Catalog_input", "to": "Merged_Spool_Data", "arrows": {"to": {"enabled": true, "type": "arrow", "scaleFactor": 0.7}}, "color": "rgba(180,180,180,1)", "dashes": false, "type": "normal", "transfer": [["LOT", "LOT → Merged_Spool_Data.LOT"], ["MFZ", "MFZ → Merged_Spool_Data.MFZ"]]}, {"from": "Saved_progress", "to": "Merged_Spool_Data", "arrows": {"to": {"enabled": true, "type": "bar", "scaleFactor": 0.7}}, "color": "rgba(180,180,180,1)", "dashes": false, "type": "normal_bar", "transfer": [["LOT", "LOT → Merged_Spool_Data.LOT"], ["Progress_Status", "Progress_Status → Merged_Spool_Data.Progress_Status"]]}, {"from": "Merged_Spool_Data", "to": "Transfer_Orders", "arrows": {"to": {"enabled": true, "type": "arrow", "scaleFactor": 0.7}}, "color": "rgba(255,223,107,1)", "dashes": true, "type": "manual", "transfer": [["LOT", "LOT → Transfer_Orders.LOT"], ["Warehouse", "формируется вручную"]]}, {"from": "Saved_progress", "to": "Transfer_Orders", "arrows": {"to": {"enabled": true, "type": "arrow", "scaleFactor": 0.7}}, "color": "rgba(150,150,150,0.25)", "dashes": false, "type": "planned", "transfer": []}, {"from": "Merged_Spool_Data", "to": "Saved_progress", "arrows": {"to": {"enabled": true, "type": "bar", "scaleFactor": 0.7}}, "color": "rgba(180,180,180,1)", "dashes": false, "type": "normal_bar", "transfer": []}]</script>
 
   <script>
     const nodeData = JSON.parse(document.getElementById("NODE_DATA").textContent);
     const visNodesRaw = JSON.parse(document.getElementById("VIS_NODES").textContent);
     const visEdgesRaw = JSON.parse(document.getElementById("VIS_EDGES").textContent);
-
     const nodes = new vis.DataSet(visNodesRaw);
     const edges = new vis.DataSet(visEdgesRaw);
 
     const container = document.getElementById("mynetwork");
     const network = new vis.Network(container, { nodes, edges }, {
-      physics: {
-        stabilization: false,
-        barnesHut: { gravitationalConstant: -4500, centralGravity: 0.25, springLength: 160 }
-      },
+      physics: { stabilization: false, barnesHut: { gravitationalConstant: -4500, springLength: 160 } },
       interaction: { hover: true },
       nodes: {
         shape: "box",
-        font: { color: "#ffffff", size: 14, multi: true, face: "Segoe UI" },
+        font: { color: "#fff", size: 14 },
         borderWidth: 1,
         margin: 10,
-        shapeProperties: { borderRadius: 8 },
-        shadow: { enabled: true, size: 5, color: "rgba(0,0,0,0.4)" }
+        shapeProperties: { borderRadius: 8 }
       },
       edges: {
         smooth: { type: "cubicBezier", roundness: 0.35 },
-        arrows: { to: { enabled: true, scaleFactor: 0.7 } },
-        width: 1.4,
-        shadow: { enabled: true, size: 3, color: "rgba(0,0,0,0.5)" }
-      },
-      groups: {
-        SharePoint: { color: { background: "#b48c1d", border: "#8a6d16" }, font: { color: "#fff" } },
-        PowerQuery: { color: { background: "#1e5ba8", border: "#15437c" }, font: { color: "#fff" } },
-        Output: { color: { background: "#20723b", border: "#17582d" }, font: { color: "#fff" } }
+        width: 1.4
       }
     });
 
-    nodes.get().forEach(n => {
-      if (typeof n.label === "string" && n.label.includes("\\\\n")) {
-        nodes.update({ id: n.id, label: n.label.replace(/\\\\n/g, "\n") });
-      }
-    });
-
-    const detailPanel = document.getElementById("details");
     const infoDiv = document.getElementById("table-info");
 
     network.on("click", function (params) {
       if (params.nodes.length > 0) {
-        const nodeId = params.nodes[0];
-        const data = nodeData[nodeId];
+        const id = params.nodes[0];
+        const data = nodeData[id];
         if (!data) return;
-        detailPanel.classList.remove("hidden");
         const rows = (data.columns || []).map(c =>
-          `<tr><td>${c.Sheet || ""}</td><td>${c.Column || ""}</td><td>${c.Link || ""}</td><td>${c.Comment || ""}</td></tr>`
+          `<tr><td>${c.Sheet}</td><td>${c.Column}</td><td>${c.Link}</td><td>${c.Comment}</td></tr>`
         ).join("");
         infoDiv.innerHTML = `
-          <h4>${nodeId}</h4>
-          <p><b>Layer:</b> ${data.layer || ""} &nbsp; | &nbsp; <b>Type:</b> ${data.type || ""}</p>
-          <p class="comment">${data.comment || ""}</p>
+          <h4>${id}</h4>
+          <p><b>Layer:</b> ${data.layer} | <b>Type:</b> ${data.type}</p>
+          <p class="comment">${data.comment}</p>
           <table>
-            <tr><th>Sheet</th><th>Column</th><th>Link</th><th>Comment</th></tr>
-            ${rows}
+            <tr><th>Sheet</th><th>Column</th><th>Link</th><th>Comment</th></tr>${rows}
           </table>`;
+      } else if (params.edges.length > 0) {
+        const e = edges.get(params.edges[0]);
+        const transfer = e.transfer || [];
+        let html = `<h4>${e.from} → ${e.to}</h4>`;
+        if (transfer.length === 0) {
+          html += "<p>Нет информации о передаче данных.</p>";
+        } else {
+          html += `<table><tr><th>Поле</th><th>Описание</th></tr>`;
+          transfer.forEach(t => { html += `<tr><td>${t[0]}</td><td>${t[1]}</td></tr>`; });
+          html += `</table>`;
+        }
+        infoDiv.innerHTML = html;
       }
     });
-
-    network.on("deselectNode", () => detailPanel.classList.add("hidden"));
   </script>
 </body>
 </html>
