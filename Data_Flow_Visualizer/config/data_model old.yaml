@@ -1,0 +1,162 @@
+# ===============================
+#  Data Flow Example – 10 nodes
+# ===============================
+nodes:
+  - name: "ERP_System"
+    layer: "Infrastructure"
+    type: "Application"
+    comment: "Основная ERP-система предприятия"
+    columns:
+      - { name: "order_id", type: "int", description: "ID заказа" }
+      - { name: "amount", type: "float", description: "Сумма" }
+
+  - name: "Database_Main"
+    layer: "Data"
+    type: "PostgreSQL"
+    comment: "Центральная база данных"
+    columns:
+      - { name: "customer_id", type: "int", description: "Код клиента" }
+      - { name: "balance", type: "float", description: "Баланс" }
+
+  - name: "File_Server"
+    layer: "Infrastructure"
+    type: "Server"
+    comment: "Файловое хранилище общих данных"
+    columns:
+      - { name: "path", type: "text", description: "Путь к файлу" }
+
+  - name: "Warehouse_App"
+    layer: "Application"
+    type: "WebApp"
+    comment: "Складское приложение"
+    columns:
+      - { name: "item_code", type: "text", description: "Код товара" }
+      - { name: "qty", type: "float", description: "Количество" }
+
+  - name: "HR_System"
+    layer: "Application"
+    type: "Service"
+    comment: "Учет сотрудников"
+    columns:
+      - { name: "employee_id", type: "int", description: "Сотрудник" }
+      - { name: "hours", type: "float", description: "Отработано часов" }
+
+  - name: "Accounting"
+    layer: "Business"
+    type: "Department"
+    comment: "Финансовый отдел"
+    columns:
+      - { name: "report_id", type: "int", description: "Отчет" }
+
+  - name: "Logistics"
+    layer: "Business"
+    type: "Department"
+    comment: "Логистика и транспорт"
+    columns:
+      - { name: "route", type: "text", description: "Маршрут" }
+
+  - name: "Analytics_BI"
+    layer: "Reporting"
+    type: "BI"
+    comment: "Система бизнес-аналитики"
+    columns:
+      - { name: "dataset", type: "text", description: "Набор данных" }
+
+  - name: "Email_Gateway"
+    layer: "Integration"
+    type: "Service"
+    comment: "Почтовый шлюз для уведомлений"
+    columns:
+      - { name: "subject", type: "text", description: "Тема письма" }
+
+  - name: "Backup_Storage"
+    layer: "Infrastructure"
+    type: "Server"
+    comment: "Хранилище резервных копий"
+    columns:
+      - { name: "file_id", type: "text", description: "Файл резервной копии" }
+
+# -----------------------------------
+edges:
+  - from: "ERP_System"
+    to: "Database_Main"
+    transfer_type: "pq"
+    data_type: "orders"
+    transfer:
+      - [ "order_id", "идентификатор заказа" ]
+      - [ "amount", "сумма заказа" ]
+
+  - from: "Warehouse_App"
+    to: "ERP_System"
+    transfer_type: "planned"
+    data_type: "inventory"
+    transfer:
+      - [ "item_code", "артикул" ]
+      - [ "qty", "количество" ]
+
+  - from: "HR_System"
+    to: "Accounting"
+    transfer_type: "manual"
+    data_type: "hours"
+    transfer:
+      - [ "employee_id", "код сотрудника" ]
+      - [ "hours", "отработанное время" ]
+
+  - from: "Accounting"
+    to: "Analytics_BI"
+    transfer_type: "pq"
+    data_type: "cost"
+    transfer:
+      - [ "report_id", "финансовый отчет" ]
+
+  - from: "ERP_System"
+    to: "Email_Gateway"
+    transfer_type: "planned"
+    data_type: "notifications"
+    transfer:
+      - [ "subject", "уведомление о заказе" ]
+
+  - from: "Database_Main"
+    to: "Backup_Storage"
+    transfer_type: "planned"
+    data_type: "backup"
+    transfer:
+      - [ "file_id", "резервная копия БД" ]
+
+# -----------------------------------
+relations:
+  - from: "ERP_System"
+    to: "Accounting"
+    connection: "financial_flow"
+    process: "month_end"
+    comment: "Передача данных о продажах"
+
+  - from: "Warehouse_App"
+    to: "Logistics"
+    connection: "shipment"
+    process: "daily_dispatch"
+    comment: "Информация о доставке"
+
+  - from: "Accounting"
+    to: "Analytics_BI"
+    connection: "reporting"
+    process: "weekly_review"
+    comment: "Передача агрегированных показателей"
+
+  - from: "HR_System"
+    to: "Analytics_BI"
+    connection: "staff_stats"
+    process: "weekly_review"
+    comment: "Статистика по персоналу"
+
+  - from: "File_Server"
+    to: "Backup_Storage"
+    connection: "copy"
+    process: "night_backup"
+    comment: "Копирование файлов"
+
+  - from: "ERP_System"
+    to: "Logistics"
+    connection: "orders_dispatch"
+    process: "daily_dispatch"
+    comment: "Планирование маршрутов"

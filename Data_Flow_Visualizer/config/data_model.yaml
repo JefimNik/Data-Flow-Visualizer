@@ -1,274 +1,643 @@
-version: 1.2
-author: Jefim
-description: Пример модели данных для Data Flow Visualizer
 nodes:
-- name: Catalog_input
-  layer: '11111'
-  type: ваввв
-  comment: Основной справочник материалов и узлов для проекта.
-  columns:
-  - comment: ngcjghc
-    description: TEXT
-    name2: Код монтажной зоны
-    type: '1'
-    пва: ''
-    test1: ''
-    test2: ''
-    test3: ''
-    test4: ''
-    test5: ''
-    test6: ''
-    test7: ''
-    test8: ''
-    test9: ''
-  - comment: '3'
-    description: Number10
-    name2: Тип материала
-    type: '1'
-    пва: ''
-    test1: ''
-    test2: ''
-    test3: g
-    test4: ''
-    test5: ''
-    test6: ''
-    test7: ''
-    test8: ''
-    test9: ''
-  - comment: ggg
-    description: TEXT
-    name2: Поставщик
-    type: '2'
-    пва: ''
-    test1: ''
-    test2: ''
-    test3: ''
-    test4: ''
-    test5: ''
-    test6: ''
-    test7: ''
-    test8: ''
-    test9: ''
-  - comment: '5'
-    description: ''
-    name2: ''
-    type: '2'
-    пва: ''
-    test1: ''
-    test2: ''
-    test3: ''
-    test4: ''
-    test5: ''
-    test6: ''
-    test7: ''
-    test8: ''
-    test9: ''
-  - comment: чапрпачр
-    description: чапр
-    name2: ачрр
-    type: dgdf
-    пва: ''
-    test1: ''
-    test2: ''
-    test3: ''
-    test4: ''
-    test5: ''
-    test6: ''
-    test7: ''
-    test8: ''
-    test9: ''
-  - comment: чапрчар
-    description: ''
-    name2: апр
-    type: ''
-    пва: ''
-    test1: ''
-    test2: ''
-    test3: ''
-    test4: ''
-    test5: ''
-    test6: ''
-    test7: ''
-    test8: ''
-    test9: ''
-  - comment: ''
-    description: ''
-    name2: пррп
-    type: ''
-    пва: ''
-    test1: ''
-    test2: ''
-    test3: ''
-    test4: ''
-    test5: ''
-    test6: g
-    test7: ''
-    test8: ''
-    test9: g
-  - comment: ''
-    description: ''
-    name2: прп
-    type: ''
-    пва: ''
-    test1: ''
-    test2: ''
-    test3: ''
-    test4: ''
-    test5: ''
-    test6: ''
-    test7: ''
-    test8: ''
-    test9: ''
-- name: Saved_progress
-  layer: SharePoint
-  type: Excel
-  comment: Статусы выполнения работ по сборочным зонам.
-  columns:
-  - name: LOT
-    type: TEXT
-    description: Код сборочной партии
-    comment: Связан с Catalog_input.LOT
-  - name: Progress_Status
-    type: TEXT
-    description: Статус выполнения
-    comment: 'Например: ''In progress'', ''Done'''
-  - name: Updated_On
-    type: DATE
-    description: Дата обновления статуса
-    comment: Автоматически из SharePoint
-- name: Work_Hours
-  layer: SharePoint
-  type: Excel
-  comment: Учёт рабочих часов по LOT и зонам.
-  columns:
-  - name: LOT4
-    type: TEXT
-    description: Идентификатор партии
-    comment: Ключ для объединения
-  - name: Employee_ID
-    type: TEXT
-    description: Код работника
-    comment: Уникальный идентификатор сотрудника
-  - name: Hours
-    type: FLOAT
-    description: Количество часов
-    comment: Указывается вручную или из WMS
-  - name: Updated_On
-    type: DATE
-    description: Дата учёта
-    comment: Дата фиксации рабочих часов
-- name: Merged_Spool_Data
-  layer: PowerQuery
-  type: Table2
-  comment: Объединённая таблица с материалами, статусами и часами.
-  columns:
-  - name: LOT
-    type: TEXT
-    description: Ключ LOT
-    comment: Импортировано из Catalog_input
-  - name: MFZ
-    type: TEXT
-    description: Код сборочной зоны
-    comment: Импортировано из Catalog_input
-  - name: Progress_Status
-    type: TEXT
-    description: Статус выполнения
-    comment: Из Saved_progress
-  - name: Hours
-    type: FLOAT
-    description: Фактическое количество часов
-    comment: Из Work_Hours
-  - name: Weight
-    type: FLOAT
-    description: Вес сборки
-    comment: Вычисляется автоматически в PQ
-  - name: 1
-    type: ''
-    description: ''
-    comment: ''
-  - name: 2
-    type: ''
-    description: ''
-    comment: ''
-  - name: 3
-    type: ''
-    description: ''
-    comment: ''
-  - name: 4
-    type: ''
-    description: ''
-    comment: ''
-- name: Transfer_Orders
-  layer: Output
-  type: Report
-  comment: Финальный отчёт с данными о партиях, статусах и трудозатратах.
-  columns:
-  - name: LOT
-    type: TEXT
-    description: Ключ сборки
-    comment: Из Merged_Spool_Data.LOT
-  - name: Warehouse
-    type: TEXT
-    description: Склад
-    comment: Заполняется вручную
-  - name: Progress_Status
-    type: TEXT
-    description: Статус
-    comment: Из Saved_progress
-  - name: Total_Hours
-    type: FLOAT
-    description: Общее количество часов
-    comment: Агрегируется из Work_Hours
-  - name: Weight
-    type: FLOAT
-    description: Вес
-    comment: Из Merged_Spool_Data.Weight
+- name: INF_Server_1
+  layer: Infrastructure
+  type: Server
+  comment: Infrastructure node INF_Server_1
+- name: INF_Server_2
+  layer: Infrastructure
+  type: Server
+  comment: Infrastructure node INF_Server_2
+- name: INF_Server_3
+  layer: Infrastructure
+  type: Server
+  comment: Infrastructure node INF_Server_3
+- name: INF_Server_4
+  layer: Infrastructure
+  type: Server
+  comment: Infrastructure node INF_Server_4
+- name: INF_Server_5
+  layer: Infrastructure
+  type: Server
+  comment: Infrastructure node INF_Server_5
+- name: INF_Server_6
+  layer: Infrastructure
+  type: Server
+  comment: Infrastructure node INF_Server_6
+- name: INF_Server_7
+  layer: Infrastructure
+  type: Server
+  comment: Infrastructure node INF_Server_7
+- name: INF_Server_8
+  layer: Infrastructure
+  type: Server
+  comment: Infrastructure node INF_Server_8
+- name: INF_Server_9
+  layer: Infrastructure
+  type: Server
+  comment: Infrastructure node INF_Server_9
+- name: INF_Server_10
+  layer: Infrastructure
+  type: Server
+  comment: Infrastructure node INF_Server_10
+- name: DB_Main_1
+  layer: Data
+  type: Database
+  comment: Data node DB_Main_1
+- name: DB_Main_2
+  layer: Data
+  type: Database
+  comment: Data node DB_Main_2
+- name: DB_Main_3
+  layer: Data
+  type: Database
+  comment: Data node DB_Main_3
+- name: DB_Main_4
+  layer: Data
+  type: Database
+  comment: Data node DB_Main_4
+- name: DB_Main_5
+  layer: Data
+  type: Database
+  comment: Data node DB_Main_5
+- name: DB_Main_6
+  layer: Data
+  type: Database
+  comment: Data node DB_Main_6
+- name: DB_Main_7
+  layer: Data
+  type: Database
+  comment: Data node DB_Main_7
+- name: DB_Main_8
+  layer: Data
+  type: Database
+  comment: Data node DB_Main_8
+- name: DB_Main_9
+  layer: Data
+  type: Database
+  comment: Data node DB_Main_9
+- name: DB_Main_10
+  layer: Data
+  type: Database
+  comment: Data node DB_Main_10
+- name: APP_Module_1
+  layer: Application
+  type: Service
+  comment: Application node APP_Module_1
+- name: APP_Module_2
+  layer: Application
+  type: Service
+  comment: Application node APP_Module_2
+- name: APP_Module_3
+  layer: Application
+  type: Service
+  comment: Application node APP_Module_3
+- name: APP_Module_4
+  layer: Application
+  type: Service
+  comment: Application node APP_Module_4
+- name: APP_Module_5
+  layer: Application
+  type: Service
+  comment: Application node APP_Module_5
+- name: APP_Module_6
+  layer: Application
+  type: Service
+  comment: Application node APP_Module_6
+- name: APP_Module_7
+  layer: Application
+  type: Service
+  comment: Application node APP_Module_7
+- name: APP_Module_8
+  layer: Application
+  type: Service
+  comment: Application node APP_Module_8
+- name: APP_Module_9
+  layer: Application
+  type: Service
+  comment: Application node APP_Module_9
+- name: APP_Module_10
+  layer: Application
+  type: Service
+  comment: Application node APP_Module_10
+- name: BUS_Department_1
+  layer: Business
+  type: Department
+  comment: Business node BUS_Department_1
+- name: BUS_Department_2
+  layer: Business
+  type: Department
+  comment: Business node BUS_Department_2
+- name: BUS_Department_3
+  layer: Business
+  type: Department
+  comment: Business node BUS_Department_3
+- name: BUS_Department_4
+  layer: Business
+  type: Department
+  comment: Business node BUS_Department_4
+- name: BUS_Department_5
+  layer: Business
+  type: Department
+  comment: Business node BUS_Department_5
+- name: BUS_Department_6
+  layer: Business
+  type: Department
+  comment: Business node BUS_Department_6
+- name: BUS_Department_7
+  layer: Business
+  type: Department
+  comment: Business node BUS_Department_7
+- name: BUS_Department_8
+  layer: Business
+  type: Department
+  comment: Business node BUS_Department_8
+- name: BUS_Department_9
+  layer: Business
+  type: Department
+  comment: Business node BUS_Department_9
+- name: BUS_Department_10
+  layer: Business
+  type: Department
+  comment: Business node BUS_Department_10
+- name: REP_System_1
+  layer: Reporting
+  type: BI
+  comment: Reporting node REP_System_1
+- name: REP_System_2
+  layer: Reporting
+  type: BI
+  comment: Reporting node REP_System_2
+- name: REP_System_3
+  layer: Reporting
+  type: BI
+  comment: Reporting node REP_System_3
+- name: REP_System_4
+  layer: Reporting
+  type: BI
+  comment: Reporting node REP_System_4
+- name: REP_System_5
+  layer: Reporting
+  type: BI
+  comment: Reporting node REP_System_5
+- name: REP_System_6
+  layer: Reporting
+  type: BI
+  comment: Reporting node REP_System_6
+- name: REP_System_7
+  layer: Reporting
+  type: BI
+  comment: Reporting node REP_System_7
+- name: REP_System_8
+  layer: Reporting
+  type: BI
+  comment: Reporting node REP_System_8
+- name: REP_System_9
+  layer: Reporting
+  type: BI
+  comment: Reporting node REP_System_9
+- name: REP_System_10
+  layer: Reporting
+  type: BI
+  comment: Reporting node REP_System_10
 edges:
-- from: Catalog_input
-  to: Merged_Spool_Data
+- from: INF_Server_1
+  to: DB_Main_1
   transfer_type: pq
-  data_type: materials
-  transfer:
-  - - LOT
-    - LOT → Merged_Spool_Data.LOT
-  - - MFZ
-    - MFZ → Merged_Spool_Data.MFZ
-- from: Saved_progress
-  to: Merged_Spool_Data
-  transfer_type: pq
-  data_type: progress
-  transfer:
-  - - Progress_Status
-    - Progress_Status → Merged_Spool_Data.Progress_Status
-- from: Work_Hours
-  to: Merged_Spool_Data
-  transfer_type: pq
-  data_type: hours
-  transfer:
-  - - LOT
-    - LOT → Merged_Spool_Data.LOT
-  - - Hours
-    - Hours → Merged_Spool_Data.Hours
-- from: Merged_Spool_Data
-  to: Transfer_Orders
-  transfer_type: manual
-  data_type: cost
-  transfer:
-  - - LOT
-    - LOT → Transfer_Orders.LOT
-  - - Warehouse
-    - Warehouse → Transfer_Orders.Warehouse
-- from: Saved_progress
-  to: Transfer_Orders
+  data_type: infra
+- from: DB_Main_1
+  to: APP_Module_1
   transfer_type: planned
-  data_type: documents
-  transfer:
-  - - Progress_Status
-    - Progress_Status → Transfer_Orders.Progress_Status
-- from: Work_Hours
-  to: Transfer_Orders
+  data_type: core
+- from: APP_Module_1
+  to: BUS_Department_1
+  transfer_type: manual
+  data_type: operations
+- from: BUS_Department_1
+  to: REP_System_1
   transfer_type: pq
-  data_type: workers
-  transfer:
-  - - Employee_ID
-    - Employee_ID → Transfer_Orders.Total_Hours
+  data_type: reports
+- from: INF_Server_2
+  to: DB_Main_2
+  transfer_type: pq
+  data_type: infra
+- from: DB_Main_2
+  to: APP_Module_2
+  transfer_type: planned
+  data_type: core
+- from: APP_Module_2
+  to: BUS_Department_2
+  transfer_type: manual
+  data_type: operations
+- from: BUS_Department_2
+  to: REP_System_2
+  transfer_type: pq
+  data_type: reports
+- from: INF_Server_3
+  to: DB_Main_3
+  transfer_type: pq
+  data_type: infra
+- from: DB_Main_3
+  to: APP_Module_3
+  transfer_type: planned
+  data_type: core
+- from: APP_Module_3
+  to: BUS_Department_3
+  transfer_type: manual
+  data_type: operations
+- from: BUS_Department_3
+  to: REP_System_3
+  transfer_type: pq
+  data_type: reports
+- from: INF_Server_4
+  to: DB_Main_4
+  transfer_type: pq
+  data_type: infra
+- from: DB_Main_4
+  to: APP_Module_4
+  transfer_type: planned
+  data_type: core
+- from: APP_Module_4
+  to: BUS_Department_4
+  transfer_type: manual
+  data_type: operations
+- from: BUS_Department_4
+  to: REP_System_4
+  transfer_type: pq
+  data_type: reports
+- from: INF_Server_5
+  to: DB_Main_5
+  transfer_type: pq
+  data_type: infra
+- from: DB_Main_5
+  to: APP_Module_5
+  transfer_type: planned
+  data_type: core
+- from: APP_Module_5
+  to: BUS_Department_5
+  transfer_type: manual
+  data_type: operations
+- from: BUS_Department_5
+  to: REP_System_5
+  transfer_type: pq
+  data_type: reports
+- from: INF_Server_6
+  to: DB_Main_6
+  transfer_type: pq
+  data_type: infra
+- from: DB_Main_6
+  to: APP_Module_6
+  transfer_type: planned
+  data_type: core
+- from: APP_Module_6
+  to: BUS_Department_6
+  transfer_type: manual
+  data_type: operations
+- from: BUS_Department_6
+  to: REP_System_6
+  transfer_type: pq
+  data_type: reports
+- from: INF_Server_7
+  to: DB_Main_7
+  transfer_type: pq
+  data_type: infra
+- from: DB_Main_7
+  to: APP_Module_7
+  transfer_type: planned
+  data_type: core
+- from: APP_Module_7
+  to: BUS_Department_7
+  transfer_type: manual
+  data_type: operations
+- from: BUS_Department_7
+  to: REP_System_7
+  transfer_type: pq
+  data_type: reports
+- from: INF_Server_8
+  to: DB_Main_8
+  transfer_type: pq
+  data_type: infra
+- from: DB_Main_8
+  to: APP_Module_8
+  transfer_type: planned
+  data_type: core
+- from: APP_Module_8
+  to: BUS_Department_8
+  transfer_type: manual
+  data_type: operations
+- from: BUS_Department_8
+  to: REP_System_8
+  transfer_type: pq
+  data_type: reports
+- from: INF_Server_9
+  to: DB_Main_9
+  transfer_type: pq
+  data_type: infra
+- from: DB_Main_9
+  to: APP_Module_9
+  transfer_type: planned
+  data_type: core
+- from: APP_Module_9
+  to: BUS_Department_9
+  transfer_type: manual
+  data_type: operations
+- from: BUS_Department_9
+  to: REP_System_9
+  transfer_type: pq
+  data_type: reports
+- from: INF_Server_10
+  to: DB_Main_10
+  transfer_type: pq
+  data_type: infra
+- from: DB_Main_10
+  to: APP_Module_10
+  transfer_type: planned
+  data_type: core
+- from: APP_Module_10
+  to: BUS_Department_10
+  transfer_type: manual
+  data_type: operations
+- from: BUS_Department_10
+  to: REP_System_10
+  transfer_type: pq
+  data_type: reports
+- from: INF_Server_1
+  to: APP_Module_6
+  transfer_type: planned
+  data_type: infra_app
+- from: DB_Main_1
+  to: BUS_Department_6
+  transfer_type: manual
+  data_type: data_to_business
+- from: APP_Module_1
+  to: REP_System_6
+  transfer_type: planned
+  data_type: analytics
+- from: BUS_Department_1
+  to: DB_Main_6
+  transfer_type: pq
+  data_type: feedback
+- from: INF_Server_2
+  to: APP_Module_7
+  transfer_type: planned
+  data_type: infra_app
+- from: DB_Main_2
+  to: BUS_Department_7
+  transfer_type: manual
+  data_type: data_to_business
+- from: APP_Module_2
+  to: REP_System_7
+  transfer_type: planned
+  data_type: analytics
+- from: BUS_Department_2
+  to: DB_Main_7
+  transfer_type: pq
+  data_type: feedback
+- from: INF_Server_3
+  to: APP_Module_8
+  transfer_type: planned
+  data_type: infra_app
+- from: DB_Main_3
+  to: BUS_Department_8
+  transfer_type: manual
+  data_type: data_to_business
+- from: APP_Module_3
+  to: REP_System_8
+  transfer_type: planned
+  data_type: analytics
+- from: BUS_Department_3
+  to: DB_Main_8
+  transfer_type: pq
+  data_type: feedback
+- from: INF_Server_4
+  to: APP_Module_9
+  transfer_type: planned
+  data_type: infra_app
+- from: DB_Main_4
+  to: BUS_Department_9
+  transfer_type: manual
+  data_type: data_to_business
+- from: APP_Module_4
+  to: REP_System_9
+  transfer_type: planned
+  data_type: analytics
+- from: BUS_Department_4
+  to: DB_Main_9
+  transfer_type: pq
+  data_type: feedback
+- from: INF_Server_5
+  to: APP_Module_10
+  transfer_type: planned
+  data_type: infra_app
+- from: DB_Main_5
+  to: BUS_Department_10
+  transfer_type: manual
+  data_type: data_to_business
+- from: APP_Module_5
+  to: REP_System_10
+  transfer_type: planned
+  data_type: analytics
+- from: BUS_Department_5
+  to: DB_Main_10
+  transfer_type: pq
+  data_type: feedback
+relations:
+- from: APP_Module_1
+  to: REP_System_2
+  connection: report_flow
+  process: weekly
+  comment: Передача аналитических данных
+- from: BUS_Department_1
+  to: BUS_Department_2
+  connection: coordination
+  process: monthly
+  comment: Координация между подразделениями
+- from: INF_Server_1
+  to: DB_Main_2
+  connection: replication
+  process: sync
+  comment: Репликация между базами
+- from: DB_Main_1
+  to: Backup_Storage_1
+  connection: backup
+  process: nightly
+  comment: Резервное копирование данных
+- from: APP_Module_2
+  to: REP_System_3
+  connection: report_flow
+  process: weekly
+  comment: Передача аналитических данных
+- from: BUS_Department_2
+  to: BUS_Department_3
+  connection: coordination
+  process: monthly
+  comment: Координация между подразделениями
+- from: INF_Server_2
+  to: DB_Main_3
+  connection: replication
+  process: sync
+  comment: Репликация между базами
+- from: DB_Main_2
+  to: Backup_Storage_2
+  connection: backup
+  process: nightly
+  comment: Резервное копирование данных
+- from: APP_Module_3
+  to: REP_System_4
+  connection: report_flow
+  process: weekly
+  comment: Передача аналитических данных
+- from: BUS_Department_3
+  to: BUS_Department_4
+  connection: coordination
+  process: monthly
+  comment: Координация между подразделениями
+- from: INF_Server_3
+  to: DB_Main_4
+  connection: replication
+  process: sync
+  comment: Репликация между базами
+- from: DB_Main_3
+  to: Backup_Storage_3
+  connection: backup
+  process: nightly
+  comment: Резервное копирование данных
+- from: APP_Module_4
+  to: REP_System_5
+  connection: report_flow
+  process: weekly
+  comment: Передача аналитических данных
+- from: BUS_Department_4
+  to: BUS_Department_5
+  connection: coordination
+  process: monthly
+  comment: Координация между подразделениями
+- from: INF_Server_4
+  to: DB_Main_5
+  connection: replication
+  process: sync
+  comment: Репликация между базами
+- from: DB_Main_4
+  to: Backup_Storage_4
+  connection: backup
+  process: nightly
+  comment: Резервное копирование данных
+- from: APP_Module_5
+  to: REP_System_6
+  connection: report_flow
+  process: weekly
+  comment: Передача аналитических данных
+- from: BUS_Department_5
+  to: BUS_Department_6
+  connection: coordination
+  process: monthly
+  comment: Координация между подразделениями
+- from: INF_Server_5
+  to: DB_Main_6
+  connection: replication
+  process: sync
+  comment: Репликация между базами
+- from: DB_Main_5
+  to: Backup_Storage_5
+  connection: backup
+  process: nightly
+  comment: Резервное копирование данных
+- from: APP_Module_6
+  to: REP_System_7
+  connection: report_flow
+  process: weekly
+  comment: Передача аналитических данных
+- from: BUS_Department_6
+  to: BUS_Department_7
+  connection: coordination
+  process: monthly
+  comment: Координация между подразделениями
+- from: INF_Server_6
+  to: DB_Main_7
+  connection: replication
+  process: sync
+  comment: Репликация между базами
+- from: DB_Main_6
+  to: INF_Server_1
+  connection: backup
+  process: nightly
+  comment: Резервное копирование данных
+- from: APP_Module_7
+  to: REP_System_8
+  connection: report_flow
+  process: weekly
+  comment: Передача аналитических данных
+- from: BUS_Department_7
+  to: BUS_Department_8
+  connection: coordination
+  process: monthly
+  comment: Координация между подразделениями
+- from: INF_Server_7
+  to: DB_Main_8
+  connection: replication
+  process: sync
+  comment: Репликация между базами
+- from: DB_Main_7
+  to: INF_Server_2
+  connection: backup
+  process: nightly
+  comment: Резервное копирование данных
+- from: APP_Module_8
+  to: REP_System_9
+  connection: report_flow
+  process: weekly
+  comment: Передача аналитических данных
+- from: BUS_Department_8
+  to: BUS_Department_9
+  connection: coordination
+  process: monthly
+  comment: Координация между подразделениями
+- from: INF_Server_8
+  to: DB_Main_9
+  connection: replication
+  process: sync
+  comment: Репликация между базами
+- from: DB_Main_8
+  to: INF_Server_3
+  connection: backup
+  process: nightly
+  comment: Резервное копирование данных
+- from: APP_Module_9
+  to: REP_System_10
+  connection: report_flow
+  process: weekly
+  comment: Передача аналитических данных
+- from: BUS_Department_9
+  to: BUS_Department_10
+  connection: coordination
+  process: monthly
+  comment: Координация между подразделениями
+- from: INF_Server_9
+  to: DB_Main_10
+  connection: replication
+  process: sync
+  comment: Репликация между базами
+- from: DB_Main_9
+  to: INF_Server_4
+  connection: backup
+  process: nightly
+  comment: Резервное копирование данных
+- from: APP_Module_10
+  to: REP_System_1
+  connection: report_flow
+  process: weekly
+  comment: Передача аналитических данных
+- from: BUS_Department_10
+  to: BUS_Department_1
+  connection: coordination
+  process: monthly
+  comment: Координация между подразделениями
+- from: INF_Server_10
+  to: DB_Main_1
+  connection: replication
+  process: sync
+  comment: Репликация между базами
+- from: DB_Main_10
+  to: INF_Server_5
+  connection: backup
+  process: nightly
+  comment: Резервное копирование данных

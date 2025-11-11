@@ -85,6 +85,17 @@ def make_excel(data_model: dict) -> BytesIO:
         edges = data_model.get("edges", [])
         df_edges = pd.DataFrame(edges)
         df_edges.to_excel(writer, sheet_name="Edges", index=False)
+        # ----- Лист 4: Relations -----
+        relations = data_model.get("relations", [])
+        df_rel = pd.DataFrame(relations)
+        df_rel.to_excel(writer, sheet_name="Relations", index=False)
+        # ----- Лист 4: Relations -----
+        relations = data_model.get("relations", [])
+        if relations:
+            df_rel = pd.DataFrame(relations)
+        else:
+            df_rel = pd.DataFrame(columns=["from", "to", "connection", "process", "comment"])
+        df_rel.to_excel(writer, sheet_name="Relations", index=False)
 
     buffer.seek(0)
     return buffer
@@ -115,6 +126,21 @@ def rebuild_from_excel(uploaded_file) -> dict:
         df_edges = df_edges.drop(0).fillna("").astype(str)
     else:
         df_edges = pd.DataFrame(columns=["from", "to", "transfer_type", "data_type", "transfer"])
+    # --- Relations ---
+    if "Relations" in wb.sheetnames:
+        df_rel = pd.DataFrame(wb["Relations"].values)
+        df_rel.columns = df_rel.iloc[0]
+        df_rel = df_rel.drop(0).fillna("").astype(str)
+    else:
+        df_rel = pd.DataFrame(columns=["from", "to", "connection", "process", "comment"])
+
+    # --- Relations ---
+    if "Relations" in wb.sheetnames:
+        df_rel = pd.DataFrame(wb["Relations"].values)
+        df_rel.columns = df_rel.iloc[0]
+        df_rel = df_rel.drop(0).fillna("").astype(str)
+    else:
+        df_rel = pd.DataFrame(columns=["from", "to", "connection", "process", "comment"])
 
     # --- Формируем узлы с колонками ---
     for _, n in df_nodes.iterrows():
@@ -128,11 +154,12 @@ def rebuild_from_excel(uploaded_file) -> dict:
             "columns": textify(cols_df.to_dict(orient="records")),
         }
         data_model["nodes"].append(node_dict)
-
+        data_model["relations"] = df_rel.to_dict(orient="records")
     # --- Связи ---
     for _, e in df_edges.iterrows():
         e_dict = {str(k): str(v) for k, v in e.items()}
         data_model["edges"].append(e_dict)
+    data_model["relations"] = df_rel.to_dict(orient="records")
 
     return data_model
 
